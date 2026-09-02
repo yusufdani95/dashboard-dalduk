@@ -59,6 +59,12 @@ const app = new Elysia()
       summary: 'Halaman Admin Panel (CRUD Data Sekolah & Users)',
     },
   })
+  .get('/logo.png', () => Bun.file('public/logo.png'), {
+    detail: {
+      tags: ['General'],
+      summary: 'Logo PNG asset',
+    },
+  })
   .use(healthRoutes)
   .use(authRoutes)
   .use(usersRoutes)

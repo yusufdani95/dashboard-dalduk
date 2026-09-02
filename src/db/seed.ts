@@ -52,6 +52,8 @@ export async function seedDatabase() {
         \`klasifikasi\` ENUM('Terdaftar', 'Dasar', 'Paripurna') NOT NULL,
         \`wilayah\` VARCHAR(255) NOT NULL,
         \`alamat\` VARCHAR(255),
+        \`latitude\` VARCHAR(50),
+        \`longitude\` VARCHAR(50),
         \`created_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         \`updated_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -70,6 +72,8 @@ export async function seedDatabase() {
             \`klasifikasi\` ENUM('Terdaftar', 'Dasar', 'Paripurna') NOT NULL,
             \`wilayah\` VARCHAR(255) NOT NULL,
             \`alamat\` VARCHAR(255),
+            \`latitude\` VARCHAR(50),
+            \`longitude\` VARCHAR(50),
             \`created_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             \`updated_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
           ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -77,6 +81,16 @@ export async function seedDatabase() {
       }
     } catch (e) {
       console.log('Warning checking data_sekolah table:', e);
+    }
+
+    // Ensure columns latitude and longitude exist
+    try {
+      const [colsLat]: any = await poolConnection.query(`SHOW COLUMNS FROM \`data_sekolah\` LIKE 'latitude'`);
+      if (colsLat.length === 0) {
+        await poolConnection.query(`ALTER TABLE \`data_sekolah\` ADD COLUMN \`latitude\` VARCHAR(50) AFTER \`alamat\`, ADD COLUMN \`longitude\` VARCHAR(50) AFTER \`latitude\``);
+      }
+    } catch (e) {
+      console.log('Warning patching latitude/longitude columns:', e);
     }
 
     // Seed default admin if no admin exists
@@ -109,6 +123,8 @@ export async function seedDatabase() {
           klasifikasi: 'Paripurna' as const,
           wilayah: 'Kota Serang',
           alamat: 'Jl. Veteran No. 1, Serang',
+          latitude: '-6.1189',
+          longitude: '106.1528',
         },
         {
           namaSekolah: 'SD Negeri 1 Cilegon',
@@ -116,6 +132,8 @@ export async function seedDatabase() {
           klasifikasi: 'Dasar' as const,
           wilayah: 'Kota Cilegon',
           alamat: 'Jl. Jend. Sudirman No. 45, Cilegon',
+          latitude: '-6.0185',
+          longitude: '106.0532',
         },
         {
           namaSekolah: 'SMP Negeri 1 Tangerang',
@@ -123,6 +141,8 @@ export async function seedDatabase() {
           klasifikasi: 'Paripurna' as const,
           wilayah: 'Kota Tangerang',
           alamat: 'Jl. Daan Mogot No. 12, Sukasari',
+          latitude: '-6.1764',
+          longitude: '106.6348',
         },
         {
           namaSekolah: 'SMP Negeri 3 Tangerang Selatan',
@@ -130,6 +150,8 @@ export async function seedDatabase() {
           klasifikasi: 'Dasar' as const,
           wilayah: 'Kota Tangerang Selatan',
           alamat: 'Jl. Pahlawan Seribu No. 88, BSD City',
+          latitude: '-6.2898',
+          longitude: '106.7171',
         },
         {
           namaSekolah: 'SMA Negeri 1 Serang',
@@ -137,6 +159,8 @@ export async function seedDatabase() {
           klasifikasi: 'Paripurna' as const,
           wilayah: 'Kota Serang',
           alamat: 'Jl. Ahmad Yani No. 130, Serang',
+          latitude: '-6.1218',
+          longitude: '106.1664',
         },
         {
           namaSekolah: 'SMA Negeri 1 Rangkasbitung',
@@ -144,6 +168,8 @@ export async function seedDatabase() {
           klasifikasi: 'Paripurna' as const,
           wilayah: 'Kabupaten Lebak',
           alamat: 'Jl. RT Hardiwinangun No. 24, Rangkasbitung',
+          latitude: '-6.3575',
+          longitude: '106.2482',
         },
         {
           namaSekolah: 'SD Negeri 1 Pandeglang',
@@ -151,6 +177,8 @@ export async function seedDatabase() {
           klasifikasi: 'Terdaftar' as const,
           wilayah: 'Kabupaten Pandeglang',
           alamat: 'Jl. Majasari No. 3, Pandeglang',
+          latitude: '-6.3088',
+          longitude: '105.9785',
         },
         {
           namaSekolah: 'SMA Negeri 2 Balaraja',
@@ -158,6 +186,8 @@ export async function seedDatabase() {
           klasifikasi: 'Dasar' as const,
           wilayah: 'Kabupaten Tangerang',
           alamat: 'Jl. Raya Serang Km 24, Balaraja',
+          latitude: '-6.1920',
+          longitude: '106.4628',
         },
         {
           namaSekolah: 'SMP Negeri 1 Ciruas',
@@ -165,6 +195,8 @@ export async function seedDatabase() {
           klasifikasi: 'Paripurna' as const,
           wilayah: 'Kabupaten Serang',
           alamat: 'Jl. Raya Jakarta Km 9, Ciruas',
+          latitude: '-6.1428',
+          longitude: '106.2160',
         },
         {
           namaSekolah: 'SD Islam Al-Azhar BSD',
@@ -172,6 +204,8 @@ export async function seedDatabase() {
           klasifikasi: 'Paripurna' as const,
           wilayah: 'Kota Tangerang Selatan',
           alamat: 'Jl. Sektor 1.2 BSD, Serpong',
+          latitude: '-6.2970',
+          longitude: '106.6888',
         },
       ];
 

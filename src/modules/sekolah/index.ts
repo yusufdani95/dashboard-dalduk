@@ -220,6 +220,8 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
             klasifikasi: body.klasifikasi as any,
             wilayah: body.wilayah,
             alamat: body.alamat || null,
+            latitude: body.latitude || null,
+            longitude: body.longitude || null,
           })
           .$returningId();
 
@@ -252,6 +254,8 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
         ]),
         wilayah: t.String({ minLength: 1, maxLength: 255 }),
         alamat: t.Optional(t.Nullable(t.String({ maxLength: 255 }))),
+        latitude: t.Optional(t.Nullable(t.String({ maxLength: 50 }))),
+        longitude: t.Optional(t.Nullable(t.String({ maxLength: 50 }))),
       }),
       detail: {
         tags: ['Sekolah'],
@@ -338,6 +342,8 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
             klasifikasi: klasifikasi as any,
             wilayah: item.wilayah ? item.wilayah.trim() : 'Kota Serang',
             alamat: item.alamat ? item.alamat.trim() : null,
+            latitude: item.latitude ? String(item.latitude).trim() : null,
+            longitude: item.longitude ? String(item.longitude).trim() : null,
           };
         }).filter(item => item.namaSekolah.length > 0);
 
@@ -370,6 +376,8 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
             klasifikasi: t.String(),
             wilayah: t.String(),
             alamat: t.Optional(t.Nullable(t.String())),
+            latitude: t.Optional(t.Nullable(t.String())),
+            longitude: t.Optional(t.Nullable(t.String())),
           })
         ),
       }),
@@ -400,6 +408,8 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
             klasifikasi: body.klasifikasi as any,
             wilayah: body.wilayah,
             alamat: body.alamat || null,
+            latitude: body.latitude || null,
+            longitude: body.longitude || null,
           })
           .where(eq(dataSekolah.no, no));
 
@@ -431,6 +441,8 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
         ]),
         wilayah: t.String({ minLength: 1, maxLength: 255 }),
         alamat: t.Optional(t.Nullable(t.String({ maxLength: 255 }))),
+        latitude: t.Optional(t.Nullable(t.String({ maxLength: 50 }))),
+        longitude: t.Optional(t.Nullable(t.String({ maxLength: 50 }))),
       }),
       detail: {
         tags: ['Sekolah'],

@@ -36,6 +36,8 @@ export const dataSekolah = mysqlTable('data_sekolah', {
   klasifikasi: klasifikasiEnum.notNull(),
   wilayah: varchar('wilayah', { length: 255 }).notNull(),
   alamat: varchar('alamat', { length: 255 }),
+  latitude: varchar('latitude', { length: 50 }),
+  longitude: varchar('longitude', { length: 50 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
 });
