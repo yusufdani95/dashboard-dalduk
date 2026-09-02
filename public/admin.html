@@ -1187,6 +1187,10 @@
         } else {
           XLSX.writeFile(workbook, filename);
         }
+      } catch (err) {
+        console.error(err);
+        alert('Terjadi kesalahan saat mengunduh file Excel.');
+      }
     }
 
     // Helper function for HTML escaping
