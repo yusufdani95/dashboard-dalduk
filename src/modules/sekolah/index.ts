@@ -1,10 +1,19 @@
 import { Elysia, t } from 'elysia';
+import { jwt } from '@elysiajs/jwt';
+import { jwtSecret } from '../auth';
+import { authenticateAndAuthorize } from '../users';
 import { db } from '../../db';
 import { dataSekolah } from '../../db/schema';
 import { eq } from 'drizzle-orm';
 
 export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
-  // GET /api/sekolah - List all schools with optional search, filters, and pagination
+  .use(
+    jwt({
+      name: 'jwt',
+      secret: jwtSecret,
+    })
+  )
+  // GET /api/sekolah - Public access: List all schools with search, filters, and pagination
   .get(
     '/',
     async ({ query }) => {
@@ -40,7 +49,6 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
         const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
         const limitNum = parseInt(limit as string, 10) || 10;
 
-        // If limit is <= 0 or 99999, return all items (useful for map markers)
         let paginatedResult = result;
         let totalPages = 1;
 
@@ -91,7 +99,7 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
     }
   )
 
-  // GET /api/sekolah/stats - Aggregated stats with dynamic filtering support
+  // GET /api/sekolah/stats - Public access: Aggregated stats
   .get(
     '/stats',
     async ({ query }) => {
@@ -100,7 +108,6 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
       try {
         const allRawData = await db.select().from(dataSekolah);
 
-        // Calculate all unique wilayah available in DB (for dropdown option populate)
         const availableWilayah = Array.from(
           new Set(allRawData.map((item) => item.wilayah))
         ).sort();
@@ -194,10 +201,16 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
     }
   )
 
-  // POST /api/sekolah - Add new sekolah
+  // POST /api/sekolah - Add new sekolah (Admin & Operator Sekolah)
   .post(
     '/',
-    async ({ body, set }) => {
+    async ({ body, jwt, cookie: { auth_token }, headers, set }) => {
+      const auth = await authenticateAndAuthorize(jwt, auth_token, headers, ['admin', 'operator_sekolah']);
+      if (!auth.authorized) {
+        set.status = auth.status;
+        return { success: false, error: auth.error };
+      }
+
       try {
         const [inserted] = await db
           .insert(dataSekolah)
@@ -242,15 +255,80 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
       }),
       detail: {
         tags: ['Sekolah'],
-        summary: 'Add a new sekolah record',
+        summary: 'Add a new sekolah record (Admin & Operator Sekolah)',
       },
     }
   )
 
-  // DELETE /api/sekolah/:npsn - Delete a sekolah
+  // PUT /api/sekolah/:npsn - Update a sekolah (Admin & Operator Sekolah)
+  .put(
+    '/:npsn',
+    async ({ params, body, jwt, cookie: { auth_token }, headers, set }) => {
+      const auth = await authenticateAndAuthorize(jwt, auth_token, headers, ['admin', 'operator_sekolah']);
+      if (!auth.authorized) {
+        set.status = auth.status;
+        return { success: false, error: auth.error };
+      }
+
+      try {
+        const npsn = Number(params.npsn);
+        await db
+          .update(dataSekolah)
+          .set({
+            namaSekolah: body.namaSekolah,
+            jenjang: body.jenjang as any,
+            klasifikasi: body.klasifikasi as any,
+            wilayah: body.wilayah,
+            alamat: body.alamat || null,
+          })
+          .where(eq(dataSekolah.npsn, npsn));
+
+        return {
+          success: true,
+          message: 'Data sekolah berhasil diperbarui',
+        };
+      } catch (error: any) {
+        set.status = 500;
+        return {
+          success: false,
+          error: error?.message || 'Gagal memperbarui data sekolah',
+        };
+      }
+    },
+    {
+      params: t.Object({ npsn: t.Numeric() }),
+      body: t.Object({
+        namaSekolah: t.String({ minLength: 1, maxLength: 150 }),
+        jenjang: t.Union([
+          t.Literal('SD / Sederajat'),
+          t.Literal('SMP / Sederajat'),
+          t.Literal('SMA / Sederajat'),
+        ]),
+        klasifikasi: t.Union([
+          t.Literal('Terdaftar'),
+          t.Literal('Dasar'),
+          t.Literal('Paripurna'),
+        ]),
+        wilayah: t.String({ minLength: 1, maxLength: 255 }),
+        alamat: t.Optional(t.Nullable(t.String({ maxLength: 255 }))),
+      }),
+      detail: {
+        tags: ['Sekolah'],
+        summary: 'Update a sekolah record by NPSN (Admin & Operator Sekolah)',
+      },
+    }
+  )
+
+  // DELETE /api/sekolah/:npsn - Delete a sekolah (Admin & Operator Sekolah)
   .delete(
     '/:npsn',
-    async ({ params, set }) => {
+    async ({ params, jwt, cookie: { auth_token }, headers, set }) => {
+      const auth = await authenticateAndAuthorize(jwt, auth_token, headers, ['admin', 'operator_sekolah']);
+      if (!auth.authorized) {
+        set.status = auth.status;
+        return { success: false, error: auth.error };
+      }
+
       try {
         const npsn = Number(params.npsn);
         await db.delete(dataSekolah).where(eq(dataSekolah.npsn, npsn));
@@ -272,107 +350,7 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
       }),
       detail: {
         tags: ['Sekolah'],
-        summary: 'Delete a sekolah record by NPSN',
-      },
-    }
-  )
-
-  // POST /api/sekolah/seed - Seed sample school data
-  .post(
-    '/seed',
-    async () => {
-      const sampleSchools = [
-        {
-          namaSekolah: 'SD Negeri 2 Serang',
-          jenjang: 'SD / Sederajat' as const,
-          klasifikasi: 'Paripurna' as const,
-          wilayah: 'Kota Serang',
-          alamat: 'Jl. Veteran No. 1, Serang',
-        },
-        {
-          namaSekolah: 'SD Negeri 1 Cilegon',
-          jenjang: 'SD / Sederajat' as const,
-          klasifikasi: 'Dasar' as const,
-          wilayah: 'Kota Cilegon',
-          alamat: 'Jl. Jend. Sudirman No. 45, Cilegon',
-        },
-        {
-          namaSekolah: 'SMP Negeri 1 Tangerang',
-          jenjang: 'SMP / Sederajat' as const,
-          klasifikasi: 'Paripurna' as const,
-          wilayah: 'Kota Tangerang',
-          alamat: 'Jl. Daan Mogot No. 12, Sukasari',
-        },
-        {
-          namaSekolah: 'SMP Negeri 3 Tangerang Selatan',
-          jenjang: 'SMP / Sederajat' as const,
-          klasifikasi: 'Dasar' as const,
-          wilayah: 'Kota Tangerang Selatan',
-          alamat: 'Jl. Pahlawan Seribu No. 88, BSD City',
-        },
-        {
-          namaSekolah: 'SMA Negeri 1 Serang',
-          jenjang: 'SMA / Sederajat' as const,
-          klasifikasi: 'Paripurna' as const,
-          wilayah: 'Kota Serang',
-          alamat: 'Jl. Ahmad Yani No. 130, Serang',
-        },
-        {
-          namaSekolah: 'SMA Negeri 1 Rangkasbitung',
-          jenjang: 'SMA / Sederajat' as const,
-          klasifikasi: 'Paripurna' as const,
-          wilayah: 'Kabupaten Lebak',
-          alamat: 'Jl. RT Hardiwinangun No. 24, Rangkasbitung',
-        },
-        {
-          namaSekolah: 'SD Negeri 1 Pandeglang',
-          jenjang: 'SD / Sederajat' as const,
-          klasifikasi: 'Terdaftar' as const,
-          wilayah: 'Kabupaten Pandeglang',
-          alamat: 'Jl. Majasari No. 3, Pandeglang',
-        },
-        {
-          namaSekolah: 'SMA Negeri 2 Balaraja',
-          jenjang: 'SMA / Sederajat' as const,
-          klasifikasi: 'Dasar' as const,
-          wilayah: 'Kabupaten Tangerang',
-          alamat: 'Jl. Raya Serang Km 24, Balaraja',
-        },
-        {
-          namaSekolah: 'SMP Negeri 1 Ciruas',
-          jenjang: 'SMP / Sederajat' as const,
-          klasifikasi: 'Paripurna' as const,
-          wilayah: 'Kabupaten Serang',
-          alamat: 'Jl. Raya Jakarta Km 9, Ciruas',
-        },
-        {
-          namaSekolah: 'SD Islam Al-Azhar BSD',
-          jenjang: 'SD / Sederajat' as const,
-          klasifikasi: 'Paripurna' as const,
-          wilayah: 'Kota Tangerang Selatan',
-          alamat: 'Jl. Sektor 1.2 BSD, Serpong',
-        },
-      ];
-
-      try {
-        for (const school of sampleSchools) {
-          await db.insert(dataSekolah).values(school);
-        }
-        return {
-          success: true,
-          message: `${sampleSchools.length} sampel data sekolah berhasil di-seed!`,
-        };
-      } catch (error: any) {
-        return {
-          success: false,
-          error: error?.message || 'Gagal memproses seed data',
-        };
-      }
-    },
-    {
-      detail: {
-        tags: ['Sekolah'],
-        summary: 'Seed sample data sekolah into database',
+        summary: 'Delete a sekolah record by NPSN (Admin & Operator Sekolah)',
       },
     }
   );

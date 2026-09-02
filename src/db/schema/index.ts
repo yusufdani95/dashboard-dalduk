@@ -1,9 +1,15 @@
-import { mysqlTable, serial, int, varchar, mysqlEnum, decimal, timestamp } from 'drizzle-orm/mysql-core';
+import { mysqlTable, serial, int, varchar, mysqlEnum, boolean, timestamp } from 'drizzle-orm/mysql-core';
+
+export const roleEnum = mysqlEnum('role_id', ['admin', 'operator_sekolah', 'viewer']);
 
 export const users = mysqlTable('users', {
-  id: serial('id').primaryKey(),
-  name: varchar('name', { length: 255 }).notNull(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
+  idUser: int('id_user').primaryKey().autoincrement(),
+  username: varchar('username', { length: 50 }).notNull().unique(),
+  email: varchar('email', { length: 150 }).notNull().unique(),
+  password: varchar('password', { length: 255 }).notNull(),
+  namaLengkap: varchar('nama_lengkap', { length: 150 }).notNull(),
+  roleId: roleEnum.notNull().default('viewer'),
+  isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
 });

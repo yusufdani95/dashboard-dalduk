@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Dashboard Dalduk Banten</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-modal {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-30 px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold">
+        <i class="fa-solid fa-gauge-high text-lg"></i>
+      </div>
+      <div>
+        <h1 class="text-base font-bold text-white tracking-tight">Admin & Control Panel</h1>
+        <p class="text-xs text-slate-400">Sistem Informasi Pengendalian Penduduk Banten</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <a href="/dashboard" target="_blank" class="text-xs font-medium text-slate-300 hover:text-indigo-400 transition bg-slate-800/80 px-3 py-2 rounded-lg border border-slate-700/80 flex items-center gap-2">
+        <i class="fa-solid fa-globe text-indigo-400"></i>
+        <span>Dashboard Publik</span>
+      </a>
+
+      <!-- User Profile Badge -->
+      <div class="flex items-center gap-3 bg-slate-800/90 px-3.5 py-1.5 rounded-xl border border-slate-700/60">
+        <div class="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs" id="userAvatar">
+          A
+        </div>
+        <div class="text-left hidden sm:block">
+          <div class="text-xs font-semibold text-white leading-none" id="userName">Loading...</div>
+          <div class="text-[10px] text-indigo-300 mt-1 uppercase font-bold tracking-wider" id="userRoleBadge">-</div>
+        </div>
+        <button id="btnLogout" class="ml-2 text-slate-400 hover:text-red-400 transition p-1.5 rounded-lg hover:bg-slate-700/50" title="Logout">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="flex-1 flex flex-col md:flex-row">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="w-full md:w-64 bg-slate-900/60 border-r border-slate-800/80 p-4 shrink-0">
+      <div class="text-xs font-semibold uppercase text-slate-400 tracking-wider mb-3 px-3">Menu Kelola</div>
+      <nav class="space-y-1">
+        <button id="navSekolah" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition bg-indigo-600 text-white shadow-md">
+          <i class="fa-solid fa-school text-base w-5 text-center"></i>
+          <span>Kelola Data Sekolah</span>
+        </button>
+
+        <button id="navUsers" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white">
+          <i class="fa-solid fa-users text-base w-5 text-center"></i>
+          <span>Kelola Users (RBAC)</span>
+        </button>
+      </nav>
+
+      <div class="mt-8 p-4 rounded-xl bg-slate-800/40 border border-slate-800 text-xs text-slate-400">
+        <div class="font-semibold text-slate-200 mb-1"><i class="fa-solid fa-circle-info text-indigo-400 mr-1"></i> Informasi Peran</div>
+        <p id="roleDescription" class="leading-relaxed">Memuat hak akses...</p>
+      </div>
+    </aside>
+
+    <!-- Content Body -->
+    <main class="flex-1 p-6 overflow-y-auto">
+      
+      <!-- TAB 1: KELOLA DATA SEKOLAH -->
+      <section id="tabSekolah" class="space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Kelola Data Sekolah</h2>
+            <p class="text-xs text-slate-400 mt-1">Tambah, edit, dan hapus data sekolah yang ditampilkan pada Dashboard publik</p>
+          </div>
+          <button id="btnTambahSekolah" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
+            <i class="fa-solid fa-plus"></i>
+            <span>Tambah Sekolah</span>
+          </button>
+        </div>
+
+        <!-- Filters & Search -->
+        <div class="glass-panel p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div class="relative w-full md:w-80">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+            <input type="text" id="searchSekolahInput" placeholder="Cari nama, wilayah, alamat, NPSN..." class="w-full pl-10 pr-4 py-2 bg-slate-900/80 border border-slate-700/80 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <select id="filterJenjangSelect" class="bg-slate-900/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="">Semua Jenjang</option>
+              <option value="SD / Sederajat">SD / Sederajat</option>
+              <option value="SMP / Sederajat">SMP / Sederajat</option>
+              <option value="SMA / Sederajat">SMA / Sederajat</option>
+            </select>
+
+            <select id="filterKlasifikasiSelect" class="bg-slate-900/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="">Semua Klasifikasi</option>
+              <option value="Terdaftar">Terdaftar</option>
+              <option value="Dasar">Dasar</option>
+              <option value="Paripurna">Paripurna</option>
+            </select>
+
+            <select id="filterWilayahSelect" class="bg-slate-900/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="">Semua Wilayah Banten</option>
+              <option value="Kabupaten Serang">Kabupaten Serang</option>
+              <option value="Kabupaten Tangerang">Kabupaten Tangerang</option>
+              <option value="Kabupaten Pandeglang">Kabupaten Pandeglang</option>
+              <option value="Kabupaten Lebak">Kabupaten Lebak</option>
+              <option value="Kota Serang">Kota Serang</option>
+              <option value="Kota Cilegon">Kota Cilegon</option>
+              <option value="Kota Tangerang">Kota Tangerang</option>
+              <option value="Kota Tangerang Selatan">Kota Tangerang Selatan</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Table Sekolah -->
+        <div class="glass-panel rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-300">
+              <thead class="bg-slate-900/90 text-xs uppercase font-semibold text-slate-400 border-b border-slate-800">
+                <tr>
+                  <th class="px-5 py-3.5">NPSN</th>
+                  <th class="px-5 py-3.5">Nama Sekolah</th>
+                  <th class="px-5 py-3.5">Jenjang</th>
+                  <th class="px-5 py-3.5">Klasifikasi</th>
+                  <th class="px-5 py-3.5">Wilayah</th>
+                  <th class="px-5 py-3.5">Alamat</th>
+                  <th class="px-5 py-3.5 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="sekolahTableBody" class="divide-y divide-slate-800/80">
+                <tr>
+                  <td colspan="7" class="px-5 py-8 text-center text-slate-400">Memuat data sekolah...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Footer -->
+          <div class="px-5 py-3.5 bg-slate-900/60 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <span id="sekolahPaginationInfo">Menampilkan 0 dari 0 data</span>
+            <div class="flex items-center gap-2" id="sekolahPaginationBtns">
+              <!-- Dynamic buttons -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: KELOLA USERS (RBAC) -->
+      <section id="tabUsers" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white tracking-tight">Kelola Pengguna (Users & Access)</h2>
+            <p class="text-xs text-slate-400 mt-1">Manajemen akun pengguna dan hak akses peran (Admin, Operator Sekolah, Viewer)</p>
+          </div>
+          <button id="btnTambahUser" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Tambah User</span>
+          </button>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="glass-panel p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div class="relative w-full md:w-80">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+            <input type="text" id="searchUserInput" placeholder="Cari username, email, nama..." class="w-full pl-10 pr-4 py-2 bg-slate-900/80 border border-slate-700/80 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+          </div>
+
+          <div class="flex items-center gap-3">
+            <select id="filterRoleSelect" class="bg-slate-900/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="">Semua Peran (Role)</option>
+              <option value="admin">Admin</option>
+              <option value="operator_sekolah">Operator Sekolah</option>
+              <option value="viewer">Viewer</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Table Users -->
+        <div class="glass-panel rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-300">
+              <thead class="bg-slate-900/90 text-xs uppercase font-semibold text-slate-400 border-b border-slate-800">
+                <tr>
+                  <th class="px-5 py-3.5">ID</th>
+                  <th class="px-5 py-3.5">Pengguna</th>
+                  <th class="px-5 py-3.5">Email</th>
+                  <th class="px-5 py-3.5">Hak Akses (Role)</th>
+                  <th class="px-5 py-3.5">Status</th>
+                  <th class="px-5 py-3.5 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody" class="divide-y divide-slate-800/80">
+                <tr>
+                  <td colspan="6" class="px-5 py-8 text-center text-slate-400">Memuat data pengguna...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Footer -->
+          <div class="px-5 py-3.5 bg-slate-900/60 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <span id="usersPaginationInfo">Menampilkan 0 dari 0 pengguna</span>
+            <div class="flex items-center gap-2" id="usersPaginationBtns">
+              <!-- Dynamic buttons -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL: FORM SEKOLAH (TAMBAH / EDIT) -->
+  <div id="modalSekolah" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-modal w-full max-w-lg rounded-2xl p-6 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-700/60">
+        <h3 id="modalSekolahTitle" class="text-lg font-bold text-white">Tambah Data Sekolah</h3>
+        <button id="closeModalSekolah" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <form id="formSekolah" class="mt-4 space-y-4">
+        <input type="hidden" id="sekolahNpsnInput">
+
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Nama Sekolah</label>
+          <input type="text" id="sekolahNamaInput" required placeholder="Contoh: SMA Negeri 1 Serang" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Jenjang</label>
+            <select id="sekolahJenjangInput" required class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+              <option value="SD / Sederajat">SD / Sederajat</option>
+              <option value="SMP / Sederajat">SMP / Sederajat</option>
+              <option value="SMA / Sederajat">SMA / Sederajat</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Klasifikasi</label>
+            <select id="sekolahKlasifikasiInput" required class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+              <option value="Terdaftar">Terdaftar</option>
+              <option value="Dasar">Dasar</option>
+              <option value="Paripurna">Paripurna</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Wilayah (Kabupaten / Kota Banten)</label>
+          <select id="sekolahWilayahInput" required class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+            <option value="Kabupaten Serang">Kabupaten Serang</option>
+            <option value="Kabupaten Tangerang">Kabupaten Tangerang</option>
+            <option value="Kabupaten Pandeglang">Kabupaten Pandeglang</option>
+            <option value="Kabupaten Lebak">Kabupaten Lebak</option>
+            <option value="Kota Serang">Kota Serang</option>
+            <option value="Kota Cilegon">Kota Cilegon</option>
+            <option value="Kota Tangerang">Kota Tangerang</option>
+            <option value="Kota Tangerang Selatan">Kota Tangerang Selatan</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Alamat</label>
+          <textarea id="sekolahAlamatInput" rows="2" placeholder="Jl. Raya No. 123..." class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500"></textarea>
+        </div>
+
+        <div class="pt-4 border-t border-slate-700/60 flex justify-end gap-3">
+          <button type="button" id="btnCancelSekolah" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl">Batal</button>
+          <button type="submit" id="btnSaveSekolah" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/30">Simpan Data</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: FORM USER (TAMBAH / EDIT) -->
+  <div id="modalUser" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-modal w-full max-w-lg rounded-2xl p-6 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-700/60">
+        <h3 id="modalUserTitle" class="text-lg font-bold text-white">Tambah Pengguna Baru</h3>
+        <button id="closeModalUser" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <form id="formUser" class="mt-4 space-y-4">
+        <input type="hidden" id="userIdInput">
+
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Nama Lengkap</label>
+          <input type="text" id="userNamaLengkapInput" required placeholder="Contoh: Dani Yusuf" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Username</label>
+            <input type="text" id="userUsernameInput" required placeholder="dani95" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Email</label>
+            <input type="email" id="userEmailInput" required placeholder="dani@dalduk.go.id" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-300 mb-1" id="userPasswordLabel">Password</label>
+          <input type="password" id="userPasswordInput" placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+          <p class="text-[11px] text-slate-400 mt-1 hidden" id="passwordHint">Biarkan kosong jika tidak ingin mengubah password.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Role / Hak Akses</label>
+            <select id="userRoleInput" required class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+              <option value="admin">Admin (Full Access)</option>
+              <option value="operator_sekolah">Operator Sekolah</option>
+              <option value="viewer">Viewer (Read-Only)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Status Akun</label>
+            <select id="userStatusInput" required class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500">
+              <option value="true">Aktif</option>
+              <option value="false">Nonaktif</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-700/60 flex justify-end gap-3">
+          <button type="button" id="btnCancelUser" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl">Batal</button>
+          <button type="submit" id="btnSaveUser" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/30">Simpan User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT CLIENT-SIDE LOGIC -->
+  <script>
+    let currentUser = null;
+    let sekolahState = { page: 1, limit: 10, totalPages: 1 };
+    let usersState = { page: 1, limit: 10, totalPages: 1 };
+
+    // Auth Token Check
+    async function checkAuth() {
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          localStorage.removeItem('auth_token');
+          window.location.href = '/login';
+          return;
+        }
+
+        currentUser = data.user;
+        renderUserProfile();
+      } catch (e) {
+        window.location.href = '/login';
+      }
+    }
+
+    function renderUserProfile() {
+      if (!currentUser) return;
+      document.getElementById('userName').innerText = currentUser.namaLengkap || currentUser.username;
+      document.getElementById('userAvatar').innerText = (currentUser.namaLengkap || currentUser.username).charAt(0).toUpperCase();
+
+      const badge = document.getElementById('userRoleBadge');
+      const roleDesc = document.getElementById('roleDescription');
+      const navUsers = document.getElementById('navUsers');
+
+      if (currentUser.roleId === 'admin') {
+        badge.innerText = 'Administrator';
+        badge.className = 'text-[10px] text-emerald-400 mt-1 uppercase font-bold tracking-wider';
+        roleDesc.innerHTML = 'Status: <strong class="text-emerald-400">Admin</strong>.<br>Anda memiliki hak akses penuh (CRUD Sekolah & Users).';
+      } else if (currentUser.roleId === 'operator_sekolah') {
+        badge.innerText = 'Operator Sekolah';
+        badge.className = 'text-[10px] text-sky-400 mt-1 uppercase font-bold tracking-wider';
+        roleDesc.innerHTML = 'Status: <strong class="text-sky-400">Operator Sekolah</strong>.<br>Dapat mengelola (CRUD) data sekolah.';
+        navUsers.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        badge.innerText = 'Viewer';
+        badge.className = 'text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-wider';
+        roleDesc.innerHTML = 'Status: <strong class="text-slate-400">Viewer</strong>.<br>Hanya dapat melihat data.';
+        navUsers.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    // Navigation Tabs
+    const navSekolah = document.getElementById('navSekolah');
+    const navUsers = document.getElementById('navUsers');
+    const tabSekolah = document.getElementById('tabSekolah');
+    const tabUsers = document.getElementById('tabUsers');
+
+    navSekolah.addEventListener('click', () => {
+      navSekolah.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition bg-indigo-600 text-white shadow-md';
+      navUsers.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white';
+      tabSekolah.classList.remove('hidden');
+      tabUsers.classList.add('hidden');
+      loadSekolahData();
+    });
+
+    navUsers.addEventListener('click', () => {
+      if (currentUser.roleId !== 'admin') {
+        alert('Akses Ditolak: Hanya Administrator yang dapat mengakses Kelola Users.');
+        return;
+      }
+      navUsers.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition bg-indigo-600 text-white shadow-md';
+      navSekolah.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white';
+      tabUsers.classList.remove('hidden');
+      tabSekolah.classList.add('hidden');
+      loadUsersData();
+    });
+
+    // Logout
+    document.getElementById('btnLogout').addEventListener('click', async () => {
+      if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_info');
+        window.location.href = '/login';
+      }
+    });
+
+    // --- SEKOLAH DATA MANAGEMENT ---
+    async function loadSekolahData(page = 1) {
+      const search = document.getElementById('searchSekolahInput').value.trim();
+      const jenjang = document.getElementById('filterJenjangSelect').value;
+      const klasifikasi = document.getElementById('filterKlasifikasiSelect').value;
+      const wilayah = document.getElementById('filterWilayahSelect').value;
+
+      const url = new URL('/api/sekolah', window.location.origin);
+      url.searchParams.set('page', page);
+      url.searchParams.set('limit', sekolahState.limit);
+      if (search) url.searchParams.set('search', search);
+      if (jenjang) url.searchParams.set('jenjang', jenjang);
+      if (klasifikasi) url.searchParams.set('klasifikasi', klasifikasi);
+      if (wilayah) url.searchParams.set('wilayah', wilayah);
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.success) {
+          sekolahState.page = data.pagination.page;
+          sekolahState.totalPages = data.pagination.totalPages;
+          renderSekolahTable(data.data);
+          renderSekolahPagination(data.pagination);
+        }
+      } catch (e) {
+        console.error('Error loading sekolah:', e);
+      }
+    }
+
+    function renderSekolahTable(items) {
+      const tbody = document.getElementById('sekolahTableBody');
+      if (!items || items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="px-5 py-8 text-center text-slate-400">Tidak ada data sekolah ditemukan.</td></tr>`;
+        return;
+      }
+
+      const isReadOnly = currentUser?.roleId === 'viewer';
+
+      tbody.innerHTML = items.map(item => `
+        <tr class="hover:bg-slate-800/40 transition">
+          <td class="px-5 py-3 font-mono text-xs text-indigo-300">${item.npsn}</td>
+          <td class="px-5 py-3 font-medium text-white">${item.namaSekolah}</td>
+          <td class="px-5 py-3 text-xs">${item.jenjang}</td>
+          <td class="px-5 py-3">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold ${
+              item.klasifikasi === 'Paripurna' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
+              item.klasifikasi === 'Dasar' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' :
+              'bg-slate-700/50 text-slate-300'
+            }">${item.klasifikasi}</span>
+          </td>
+          <td class="px-5 py-3 text-xs text-slate-300">${item.wilayah}</td>
+          <td class="px-5 py-3 text-xs text-slate-400 max-w-xs truncate">${item.alamat || '-'}</td>
+          <td class="px-5 py-3 text-center">
+            ${isReadOnly ? '<span class="text-xs text-slate-500">Read-only</span>' : `
+              <div class="flex items-center justify-center gap-2">
+                <button onclick="editSekolah(${item.npsn}, '${encodeURIComponent(JSON.stringify(item))}')" class="p-1.5 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-lg transition" title="Edit">
+                  <i class="fa-solid fa-pen-to-square text-xs"></i>
+                </button>
+                <button onclick="deleteSekolah(${item.npsn})" class="p-1.5 bg-slate-800 hover:bg-red-600 text-slate-300 hover:text-white rounded-lg transition" title="Hapus">
+                  <i class="fa-solid fa-trash-can text-xs"></i>
+                </button>
+              </div>
+            `}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderSekolahPagination(pg) {
+      document.getElementById('sekolahPaginationInfo').innerText = `Menampilkan ${pg.totalItems === 0 ? 0 : (pg.page - 1) * pg.limit + 1} - ${Math.min(pg.page * pg.limit, pg.totalItems)} dari ${pg.totalItems} sekolah`;
+      
+      const container = document.getElementById('sekolahPaginationBtns');
+      let html = '';
+      if (pg.page > 1) {
+        html += `<button onclick="loadSekolahData(${pg.page - 1})" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg">Prev</button>`;
+      }
+      for (let i = 1; i <= pg.totalPages; i++) {
+        html += `<button onclick="loadSekolahData(${i})" class="px-3 py-1 rounded-lg ${i === pg.page ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${i}</button>`;
+      }
+      if (pg.page < pg.totalPages) {
+        html += `<button onclick="loadSekolahData(${pg.page + 1})" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg">Next</button>`;
+      }
+      container.innerHTML = html;
+    }
+
+    // Modal Sekolah Form Handlers
+    const modalSekolah = document.getElementById('modalSekolah');
+    document.getElementById('btnTambahSekolah').addEventListener('click', () => {
+      if (currentUser?.roleId === 'viewer') return alert('Hak akses Viewer tidak diperbolehkan menambah data.');
+      document.getElementById('modalSekolahTitle').innerText = 'Tambah Data Sekolah';
+      document.getElementById('formSekolah').reset();
+      document.getElementById('sekolahNpsnInput').value = '';
+      modalSekolah.classList.remove('hidden');
+    });
+
+    document.getElementById('closeModalSekolah').addEventListener('click', () => modalSekolah.classList.add('hidden'));
+    document.getElementById('btnCancelSekolah').addEventListener('click', () => modalSekolah.classList.add('hidden'));
+
+    window.editSekolah = function(npsn, encodedObj) {
+      const item = JSON.parse(decodeURIComponent(encodedObj));
+      document.getElementById('modalSekolahTitle').innerText = `Edit Data Sekolah (NPSN: ${npsn})`;
+      document.getElementById('sekolahNpsnInput').value = item.npsn;
+      document.getElementById('sekolahNamaInput').value = item.namaSekolah;
+      document.getElementById('sekolahJenjangInput').value = item.jenjang;
+      document.getElementById('sekolahKlasifikasiInput').value = item.klasifikasi;
+      document.getElementById('sekolahWilayahInput').value = item.wilayah;
+      document.getElementById('sekolahAlamatInput').value = item.alamat || '';
+      modalSekolah.classList.remove('hidden');
+    };
+
+    window.deleteSekolah = async function(npsn) {
+      if (!confirm(`Apakah Anda yakin ingin menghapus data sekolah dengan NPSN ${npsn}?`)) return;
+      const token = localStorage.getItem('auth_token');
+      try {
+        const res = await fetch(`/api/sekolah/${npsn}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+          alert(result.message);
+          loadSekolahData(sekolahState.page);
+        } else {
+          alert(result.error || 'Gagal menghapus sekolah.');
+        }
+      } catch (e) {
+        alert('Terjadi kesalahan sistem.');
+      }
+    };
+
+    document.getElementById('formSekolah').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const npsn = document.getElementById('sekolahNpsnInput').value;
+      const token = localStorage.getItem('auth_token');
+
+      const payload = {
+        namaSekolah: document.getElementById('sekolahNamaInput').value.trim(),
+        jenjang: document.getElementById('sekolahJenjangInput').value,
+        klasifikasi: document.getElementById('sekolahKlasifikasiInput').value,
+        wilayah: document.getElementById('sekolahWilayahInput').value,
+        alamat: document.getElementById('sekolahAlamatInput').value.trim(),
+      };
+
+      const url = npsn ? `/api/sekolah/${npsn}` : '/api/sekolah';
+      const method = npsn ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+
+        if (res.ok && result.success) {
+          alert(result.message);
+          modalSekolah.classList.add('hidden');
+          loadSekolahData(sekolahState.page);
+        } else {
+          alert(result.error || 'Gagal menyimpan data.');
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan koneksi.');
+      }
+    });
+
+    // --- USERS DATA MANAGEMENT ---
+    async function loadUsersData(page = 1) {
+      const search = document.getElementById('searchUserInput').value.trim();
+      const role = document.getElementById('filterRoleSelect').value;
+      const token = localStorage.getItem('auth_token');
+
+      const url = new URL('/api/users', window.location.origin);
+      url.searchParams.set('page', page);
+      url.searchParams.set('limit', usersState.limit);
+      if (search) url.searchParams.set('search', search);
+      if (role) url.searchParams.set('role', role);
+
+      try {
+        const res = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          usersState.page = data.pagination.page;
+          usersState.totalPages = data.pagination.totalPages;
+          renderUsersTable(data.data);
+          renderUsersPagination(data.pagination);
+        }
+      } catch (e) {
+        console.error('Error loading users:', e);
+      }
+    }
+
+    function renderUsersTable(items) {
+      const tbody = document.getElementById('usersTableBody');
+      if (!items || items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="px-5 py-8 text-center text-slate-400">Tidak ada pengguna ditemukan.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = items.map(u => `
+        <tr class="hover:bg-slate-800/40 transition">
+          <td class="px-5 py-3 font-mono text-xs text-indigo-300">#${u.idUser}</td>
+          <td class="px-5 py-3">
+            <div class="font-medium text-white">${u.namaLengkap}</div>
+            <div class="text-xs text-slate-400 font-mono">@${u.username}</div>
+          </td>
+          <td class="px-5 py-3 text-xs text-slate-300">${u.email}</td>
+          <td class="px-5 py-3 text-xs">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold ${
+              u.roleId === 'admin' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
+              u.roleId === 'operator_sekolah' ? 'bg-sky-500/10 text-sky-400 border border-sky-500/30' :
+              'bg-slate-700/50 text-slate-300'
+            }">${u.roleId}</span>
+          </td>
+          <td class="px-5 py-3 text-xs">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.isActive ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'}">
+              ${u.isActive ? 'AKTIF' : 'NONAKTIF'}
+            </span>
+          </td>
+          <td class="px-5 py-3 text-center">
+            <div class="flex items-center justify-center gap-2">
+              <button onclick="editUser(${u.idUser}, '${encodeURIComponent(JSON.stringify(u))}')" class="p-1.5 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-lg transition" title="Edit / Reset Password">
+                <i class="fa-solid fa-user-pen text-xs"></i>
+              </button>
+              ${u.idUser === currentUser?.idUser ? '' : `
+                <button onclick="deleteUser(${u.idUser}, '${u.username}')" class="p-1.5 bg-slate-800 hover:bg-red-600 text-slate-300 hover:text-white rounded-lg transition" title="Hapus">
+                  <i class="fa-solid fa-trash-can text-xs"></i>
+                </button>
+              `}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderUsersPagination(pg) {
+      document.getElementById('usersPaginationInfo').innerText = `Menampilkan ${pg.totalItems === 0 ? 0 : (pg.page - 1) * pg.limit + 1} - ${Math.min(pg.page * pg.limit, pg.totalItems)} dari ${pg.totalItems} pengguna`;
+      
+      const container = document.getElementById('usersPaginationBtns');
+      let html = '';
+      if (pg.page > 1) {
+        html += `<button onclick="loadUsersData(${pg.page - 1})" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg">Prev</button>`;
+      }
+      for (let i = 1; i <= pg.totalPages; i++) {
+        html += `<button onclick="loadUsersData(${i})" class="px-3 py-1 rounded-lg ${i === pg.page ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${i}</button>`;
+      }
+      if (pg.page < pg.totalPages) {
+        html += `<button onclick="loadUsersData(${pg.page + 1})" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg">Next</button>`;
+      }
+      container.innerHTML = html;
+    }
+
+    // Modal User Handlers
+    const modalUser = document.getElementById('modalUser');
+    document.getElementById('btnTambahUser').addEventListener('click', () => {
+      document.getElementById('modalUserTitle').innerText = 'Tambah Pengguna Baru';
+      document.getElementById('formUser').reset();
+      document.getElementById('userIdInput').value = '';
+      document.getElementById('userUsernameInput').readOnly = false;
+      document.getElementById('userPasswordInput').required = true;
+      document.getElementById('passwordHint').classList.add('hidden');
+      modalUser.classList.remove('hidden');
+    });
+
+    document.getElementById('closeModalUser').addEventListener('click', () => modalUser.classList.add('hidden'));
+    document.getElementById('btnCancelUser').addEventListener('click', () => modalUser.classList.add('hidden'));
+
+    window.editUser = function(idUser, encodedObj) {
+      const u = JSON.parse(decodeURIComponent(encodedObj));
+      document.getElementById('modalUserTitle').innerText = `Edit Pengguna (@${u.username})`;
+      document.getElementById('userIdInput').value = u.idUser;
+      document.getElementById('userNamaLengkapInput').value = u.namaLengkap;
+      document.getElementById('userUsernameInput').value = u.username;
+      document.getElementById('userUsernameInput').readOnly = true;
+      document.getElementById('userEmailInput').value = u.email;
+      document.getElementById('userPasswordInput').value = '';
+      document.getElementById('userPasswordInput').required = false;
+      document.getElementById('passwordHint').classList.remove('hidden');
+      document.getElementById('userRoleInput').value = u.roleId;
+      document.getElementById('userStatusInput').value = u.isActive ? 'true' : 'false';
+      modalUser.classList.remove('hidden');
+    };
+
+    window.deleteUser = async function(idUser, username) {
+      if (!confirm(`Apakah Anda yakin ingin menghapus pengguna @${username}?`)) return;
+      const token = localStorage.getItem('auth_token');
+      try {
+        const res = await fetch(`/api/users/${idUser}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+          alert(result.message);
+          loadUsersData(usersState.page);
+        } else {
+          alert(result.error || 'Gagal menghapus pengguna.');
+        }
+      } catch (e) {
+        alert('Terjadi kesalahan sistem.');
+      }
+    };
+
+    document.getElementById('formUser').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const idUser = document.getElementById('userIdInput').value;
+      const token = localStorage.getItem('auth_token');
+
+      const payload = {
+        namaLengkap: document.getElementById('userNamaLengkapInput').value.trim(),
+        username: document.getElementById('userUsernameInput').value.trim(),
+        email: document.getElementById('userEmailInput').value.trim(),
+        password: document.getElementById('userPasswordInput').value,
+        roleId: document.getElementById('userRoleInput').value,
+        isActive: document.getElementById('userStatusInput').value === 'true',
+      };
+
+      if (idUser && !payload.password) {
+        delete payload.password; // Do not send empty password on update
+      }
+
+      const url = idUser ? `/api/users/${idUser}` : '/api/users';
+      const method = idUser ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+
+        if (res.ok && result.success) {
+          alert(result.message);
+          modalUser.classList.add('hidden');
+          loadUsersData(usersState.page);
+        } else {
+          alert(result.error || 'Gagal menyimpan pengguna.');
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan koneksi.');
+      }
+    });
+
+    // Event Listeners for Filters & Search
+    document.getElementById('searchSekolahInput').addEventListener('input', () => loadSekolahData(1));
+    document.getElementById('filterJenjangSelect').addEventListener('change', () => loadSekolahData(1));
+    document.getElementById('filterKlasifikasiSelect').addEventListener('change', () => loadSekolahData(1));
+    document.getElementById('filterWilayahSelect').addEventListener('change', () => loadSekolahData(1));
+
+    document.getElementById('searchUserInput').addEventListener('input', () => loadUsersData(1));
+    document.getElementById('filterRoleSelect').addEventListener('change', () => loadUsersData(1));
+
+    // Initialize on Load
+    window.addEventListener('DOMContentLoaded', async () => {
+      await checkAuth();
+      loadSekolahData(1);
+    });
+  </script>
+</body>
+</html>
