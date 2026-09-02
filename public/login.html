@@ -36,32 +36,74 @@
     }
   </script>
   <style>
+    :root {
+      --bg-color: radial-gradient(circle at 15% 15%, #1e1b4b 0%, #0f172a 50%, #020617 100%);
+      --card-bg: rgba(30, 41, 59, 0.75);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-color: #f8fafc;
+      --title-color: #ffffff;
+      --sub-color: #94a3b8;
+      --input-bg: rgba(15, 23, 42, 0.6);
+      --input-border: rgba(51, 65, 85, 0.8);
+      --input-text: #ffffff;
+    }
+
+    html.light {
+      --bg-color: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 50%, #ffffff 100%);
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --card-border: rgba(0, 0, 0, 0.1);
+      --text-color: #0f172a;
+      --title-color: #0f172a;
+      --sub-color: #475569;
+      --input-bg: #ffffff;
+      --input-border: #cbd5e1;
+      --input-text: #0f172a;
+    }
+
     body {
-      background: radial-gradient(circle at 15% 15%, #1e1b4b 0%, #0f172a 50%, #020617 100%);
+      background: var(--bg-color);
+      color: var(--text-color);
       min-height: 100vh;
+      transition: background 0.3s ease, color 0.3s ease;
     }
     .glass-card {
-      background: rgba(30, 41, 59, 0.7);
+      background: var(--card-bg);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      transition: background 0.3s ease, border-color 0.3s ease;
     }
     .glow-effect {
       box-shadow: 0 0 25px rgba(99, 102, 241, 0.35);
     }
+    .theme-title { color: var(--title-color); }
+    .theme-sub { color: var(--sub-color); }
+    .theme-input {
+      background-color: var(--input-bg) !important;
+      border-color: var(--input-border) !important;
+      color: var(--input-text) !important;
+    }
   </style>
 </head>
-<body class="text-slate-100 flex items-center justify-center p-4">
+<body class="flex items-center justify-center p-4 relative">
 
-  <div class="w-full max-w-md">
+  <!-- Top Right Theme Switcher -->
+  <div class="absolute top-4 right-4">
+    <button id="btnThemeToggle" onclick="toggleTheme()" class="px-3.5 py-2 text-xs font-medium bg-slate-800/80 hover:bg-slate-700/80 text-white rounded-xl border border-slate-700/80 shadow-md transition flex items-center gap-2">
+      <i id="themeIcon" class="fa-solid fa-sun text-amber-400"></i>
+      <span id="themeText">Light Mode</span>
+    </button>
+  </div>
+
+  <div class="w-full max-w-md my-8">
     <!-- Header Logo & Title -->
     <div class="text-center mb-8">
       <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 mb-4 glow-effect">
         <i class="fa-solid fa-shield-halved text-3xl"></i>
       </div>
-      <h1 class="text-2xl font-bold tracking-tight text-white">Admin & Officer Portal</h1>
-      <p class="text-sm text-slate-400 mt-1">Sistem Informasi Pengendalian Penduduk (Dalduk)</p>
+      <h1 class="text-2xl font-bold tracking-tight theme-title">Admin & Officer Portal</h1>
+      <p class="text-sm theme-sub mt-1">Sistem Informasi Pengendalian Penduduk (Dalduk)</p>
     </div>
 
     <!-- Login Glass Card -->
@@ -77,7 +119,7 @@
 
       <form id="loginForm" class="space-y-5">
         <div>
-          <label for="usernameOrEmail" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+          <label for="usernameOrEmail" class="block text-xs font-semibold uppercase tracking-wider theme-sub mb-2">
             Username / Email
           </label>
           <div class="relative">
@@ -90,13 +132,13 @@
               name="usernameOrEmail"
               required 
               placeholder="Masukkan username atau email"
-              class="w-full pl-10 pr-4 py-3 bg-slate-900/60 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+              class="w-full pl-10 pr-4 py-3 theme-input rounded-xl text-sm placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
             >
           </div>
         </div>
 
         <div>
-          <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+          <label for="password" class="block text-xs font-semibold uppercase tracking-wider theme-sub mb-2">
             Password
           </label>
           <div class="relative">
@@ -109,12 +151,12 @@
               name="password"
               required 
               placeholder="••••••••"
-              class="w-full pl-10 pr-10 py-3 bg-slate-900/60 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+              class="w-full pl-10 pr-10 py-3 theme-input rounded-xl text-sm placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
             >
             <button 
               type="button"
               id="togglePassword"
-              class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white"
+              class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-indigo-400"
             >
               <i class="fa-solid fa-eye text-sm" id="eyeIcon"></i>
             </button>
@@ -131,8 +173,8 @@
         </button>
       </form>
 
-      <div class="mt-6 pt-6 border-t border-slate-700/50 text-center">
-        <a href="/dashboard" class="inline-flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-indigo-400 transition">
+      <div class="mt-6 pt-6 border-t border-slate-500/20 text-center">
+        <a href="/dashboard" class="inline-flex items-center gap-2 text-xs font-medium theme-sub hover:text-indigo-500 transition">
           <i class="fa-solid fa-arrow-left"></i>
           Kembali ke Dashboard Publik
         </a>
@@ -141,8 +183,8 @@
     </div>
 
     <!-- Default Credentials Hint Card -->
-    <div class="mt-6 p-4 rounded-xl bg-slate-900/40 border border-slate-800 text-center text-xs text-slate-400">
-      <span class="text-slate-300 font-semibold">Akun Default Admin:</span> Username: <code class="text-indigo-300 bg-slate-800 px-1.5 py-0.5 rounded">admin</code> | Password: <code class="text-indigo-300 bg-slate-800 px-1.5 py-0.5 rounded">admin123</code>
+    <div class="mt-6 p-4 rounded-xl glass-card text-center text-xs theme-sub">
+      <span class="theme-title font-semibold">Akun Default Admin:</span> Username: <code class="text-indigo-400 font-bold bg-indigo-500/10 px-1.5 py-0.5 rounded">admin</code> | Password: <code class="text-indigo-400 font-bold bg-indigo-500/10 px-1.5 py-0.5 rounded">admin123</code>
     </div>
   </div>
 
@@ -157,6 +199,37 @@
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
     const eyeIcon = document.getElementById('eyeIcon');
+
+    // Theme Management
+    function initTheme() {
+      const savedTheme = localStorage.getItem('app_theme') || 'dark';
+      applyTheme(savedTheme);
+    }
+
+    function applyTheme(theme) {
+      const htmlEl = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      const themeText = document.getElementById('themeText');
+
+      if (theme === 'light') {
+        htmlEl.classList.add('light');
+        if (themeIcon) themeIcon.className = 'fa-solid fa-moon text-indigo-600';
+        if (themeText) themeText.innerText = 'Dark Mode';
+      } else {
+        htmlEl.classList.remove('light');
+        if (themeIcon) themeIcon.className = 'fa-solid fa-sun text-amber-400';
+        if (themeText) themeText.innerText = 'Light Mode';
+      }
+      localStorage.setItem('app_theme', theme);
+    }
+
+    function toggleTheme() {
+      const currentTheme = localStorage.getItem('app_theme') || 'dark';
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      applyTheme(newTheme);
+    }
+
+    initTheme();
 
     // Toggle Password Visibility
     togglePassword.addEventListener('click', () => {
@@ -192,7 +265,6 @@
         return;
       }
 
-      // Set Loading State
       btnSubmit.disabled = true;
       btnText.innerText = 'Memproses...';
       btnSpinner.classList.remove('hidden');
