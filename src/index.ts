@@ -4,6 +4,8 @@ import { swagger } from '@elysiajs/swagger';
 import { env } from './config/env';
 import { healthRoutes } from './modules/health';
 import { sekolahRoutes } from './modules/sekolah';
+import { authRoutes } from './modules/auth';
+import { usersRoutes } from './modules/users';
 
 const app = new Elysia()
   .use(cors())
@@ -17,8 +19,10 @@ const app = new Elysia()
         },
         tags: [
           { name: 'General', description: 'General endpoints' },
-          { name: 'Health', description: 'Health check endpoints' },
+          { name: 'Auth', description: 'Authentication & Session management' },
+          { name: 'Users', description: 'User & Access Control Management (RBAC)' },
           { name: 'Sekolah', description: 'Endpoints Pengelolaan & Pemetaan Data Sekolah' },
+          { name: 'Health', description: 'Health check endpoints' },
         ],
       },
       path: '/swagger',
@@ -29,6 +33,8 @@ const app = new Elysia()
     docs: '/swagger',
     health: '/health',
     dashboard: '/dashboard',
+    login: '/login',
+    admin: '/admin',
   }), {
     detail: {
       tags: ['General'],
@@ -41,7 +47,27 @@ const app = new Elysia()
       summary: 'Frontend Dashboard Data Sekolah (Map & Charts)',
     },
   })
+  .get('/login', () => Bun.file('public/login.html'), {
+    detail: {
+      tags: ['General'],
+      summary: 'Halaman Login User & Admin',
+    },
+  })
+  .get('/admin', () => Bun.file('public/admin.html'), {
+    detail: {
+      tags: ['General'],
+      summary: 'Halaman Admin Panel (CRUD Data Sekolah & Users)',
+    },
+  })
+  .get('/logo.png', () => Bun.file('public/logo.png'), {
+    detail: {
+      tags: ['General'],
+      summary: 'Logo PNG asset',
+    },
+  })
   .use(healthRoutes)
+  .use(authRoutes)
+  .use(usersRoutes)
   .use(sekolahRoutes)
   .listen(env.PORT);
 
@@ -52,8 +78,10 @@ console.log(
   `📚 Swagger documentation available at http://${app.server?.hostname}:${app.server?.port}/swagger`
 );
 console.log(
-  `📊 Dashboard UI available at http://${app.server?.hostname}:${app.server?.port}/dashboard`
+  `📊 Public Dashboard UI at http://${app.server?.hostname}:${app.server?.port}/dashboard`
+);
+console.log(
+  `🔑 Admin Panel UI at http://${app.server?.hostname}:${app.server?.port}/admin`
 );
 
 export type App = typeof app;
-

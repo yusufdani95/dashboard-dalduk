@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login System - Dashboard Dalduk Banten</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <style>
+    :root {
+      --bg-color: radial-gradient(circle at 15% 15%, #1e1b4b 0%, #0f172a 50%, #020617 100%);
+      --card-bg: rgba(30, 41, 59, 0.75);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-color: #f8fafc;
+      --title-color: #ffffff;
+      --sub-color: #94a3b8;
+      --input-bg: rgba(15, 23, 42, 0.6);
+      --input-border: rgba(51, 65, 85, 0.8);
+      --input-text: #ffffff;
+    }
+
+    html.light {
+      --bg-color: linear-gradient(135deg, #e2e8f0 0%, #f1f5f9 50%, #ffffff 100%);
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --card-border: rgba(0, 0, 0, 0.1);
+      --text-color: #0f172a;
+      --title-color: #0f172a;
+      --sub-color: #475569;
+      --input-bg: #ffffff;
+      --input-border: #cbd5e1;
+      --input-text: #0f172a;
+    }
+
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+    .glow-effect {
+      box-shadow: 0 0 25px rgba(99, 102, 241, 0.35);
+    }
+    .theme-title { color: var(--title-color); }
+    .theme-sub { color: var(--sub-color); }
+    .theme-input {
+      background-color: var(--input-bg) !important;
+      border-color: var(--input-border) !important;
+      color: var(--input-text) !important;
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center p-4 relative">
+
+  <!-- Top Right Theme Switcher -->
+  <div class="absolute top-4 right-4">
+    <button id="btnThemeToggle" onclick="toggleTheme()" class="px-3.5 py-2 text-xs font-medium bg-slate-800/80 hover:bg-slate-700/80 text-white rounded-xl border border-slate-700/80 shadow-md transition flex items-center gap-2">
+      <i id="themeIcon" class="fa-solid fa-sun text-amber-400"></i>
+      <span id="themeText">Light Mode</span>
+    </button>
+  </div>
+
+  <div class="w-full max-w-md my-8">
+    <!-- Header Logo & Title -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center p-2 rounded-2xl bg-slate-900/40 border border-slate-700/50 mb-4 glow-effect">
+        <img src="/logo.png" alt="Logo Dalduk" class="w-16 h-16 object-contain drop-shadow">
+      </div>
+      <h1 class="text-2xl font-bold tracking-tight theme-title">Admin & Officer Portal</h1>
+      <p class="text-sm theme-sub mt-1">Sistem informasi Pengelolaan Kependudukan Perwakilan BKKBN Provinsi Banten</p>
+    </div>
+
+    <!-- Login Glass Card -->
+    <div class="glass-card rounded-2xl p-8">
+      
+      <!-- Alert Message -->
+      <div id="alertBox" class="hidden mb-6 p-4 rounded-xl text-sm font-medium border transition-all duration-200">
+        <div class="flex items-center gap-3">
+          <i id="alertIcon" class="fa-solid text-base"></i>
+          <span id="alertMessage"></span>
+        </div>
+      </div>
+
+      <form id="loginForm" class="space-y-5">
+        <div>
+          <label for="usernameOrEmail" class="block text-xs font-semibold uppercase tracking-wider theme-sub mb-2">
+            Username / Email
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-user text-sm"></i>
+            </div>
+            <input 
+              type="text" 
+              id="usernameOrEmail" 
+              name="usernameOrEmail"
+              required 
+              placeholder="Masukkan username atau email"
+              class="w-full pl-10 pr-4 py-3 theme-input rounded-xl text-sm placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+            >
+          </div>
+        </div>
+
+        <div>
+          <label for="password" class="block text-xs font-semibold uppercase tracking-wider theme-sub mb-2">
+            Password
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-lock text-sm"></i>
+            </div>
+            <input 
+              type="password" 
+              id="password" 
+              name="password"
+              required 
+              placeholder="••••••••"
+              class="w-full pl-10 pr-10 py-3 theme-input rounded-xl text-sm placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+            >
+            <button 
+              type="button"
+              id="togglePassword"
+              class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-indigo-400"
+            >
+              <i class="fa-solid fa-eye text-sm" id="eyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          id="btnSubmit"
+          class="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold rounded-xl text-sm shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 transition-all flex items-center justify-center gap-2"
+        >
+          <span id="btnText">Masuk Ke Sistem</span>
+          <i id="btnSpinner" class="fa-solid fa-spinner fa-spin hidden"></i>
+        </button>
+      </form>
+
+      <div class="mt-6 pt-6 border-t border-slate-500/20 text-center">
+        <a href="/dashboard" class="inline-flex items-center gap-2 text-xs font-medium theme-sub hover:text-indigo-500 transition">
+          <i class="fa-solid fa-arrow-left"></i>
+          Kembali ke Dashboard Publik
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const alertBox = document.getElementById('alertBox');
+    const alertIcon = document.getElementById('alertIcon');
+    const alertMessage = document.getElementById('alertMessage');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const btnText = document.getElementById('btnText');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    // Theme Management
+    function initTheme() {
+      const savedTheme = localStorage.getItem('app_theme') || 'dark';
+      applyTheme(savedTheme);
+    }
+
+    function applyTheme(theme) {
+      const htmlEl = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      const themeText = document.getElementById('themeText');
+
+      if (theme === 'light') {
+        htmlEl.classList.add('light');
+        if (themeIcon) themeIcon.className = 'fa-solid fa-moon text-indigo-600';
+        if (themeText) themeText.innerText = 'Dark Mode';
+      } else {
+        htmlEl.classList.remove('light');
+        if (themeIcon) themeIcon.className = 'fa-solid fa-sun text-amber-400';
+        if (themeText) themeText.innerText = 'Light Mode';
+      }
+      localStorage.setItem('app_theme', theme);
+    }
+
+    function toggleTheme() {
+      const currentTheme = localStorage.getItem('app_theme') || 'dark';
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      applyTheme(newTheme);
+    }
+
+    initTheme();
+
+    // Toggle Password Visibility
+    togglePassword.addEventListener('click', () => {
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    });
+
+    function showAlert(type, message) {
+      alertBox.classList.remove('hidden', 'bg-red-500/10', 'border-red-500/30', 'text-red-400', 'bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-400');
+      if (type === 'error') {
+        alertBox.classList.add('bg-red-500/10', 'border-red-500/30', 'text-red-400');
+        alertIcon.className = 'fa-solid fa-circle-exclamation text-red-400';
+      } else {
+        alertBox.classList.add('bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-400');
+        alertIcon.className = 'fa-solid fa-circle-check text-emerald-400';
+      }
+      alertMessage.innerText = message;
+    }
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const usernameOrEmail = document.getElementById('usernameOrEmail').value.trim();
+      const password = passwordInput.value;
+
+      if (!usernameOrEmail || !password) {
+        showAlert('error', 'Semua kolom wajib diisi');
+        return;
+      }
+
+      btnSubmit.disabled = true;
+      btnText.innerText = 'Memproses...';
+      btnSpinner.classList.remove('hidden');
+
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usernameOrEmail, password }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          showAlert('success', 'Login Berhasil! Mengalihkan ke Admin Panel...');
+          localStorage.setItem('auth_token', result.token);
+          localStorage.setItem('user_info', JSON.stringify(result.user));
+
+          setTimeout(() => {
+            window.location.href = '/admin';
+          }, 1000);
+        } else {
+          showAlert('error', result.error || 'Login gagal, periksa data Anda.');
+          btnSubmit.disabled = false;
+          btnText.innerText = 'Masuk Ke Sistem';
+          btnSpinner.classList.add('hidden');
+        }
+      } catch (err) {
+        showAlert('error', 'Terjadi kesalahan koneksi server.');
+        btnSubmit.disabled = false;
+        btnText.innerText = 'Masuk Ke Sistem';
+        btnSpinner.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

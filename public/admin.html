@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Dashboard Dalduk Banten</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SheetJS for Excel Export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --header-bg: rgba(15, 23, 42, 0.95);
+      --sidebar-bg: rgba(15, 23, 42, 0.6);
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --modal-bg: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --input-bg: rgba(15, 23, 42, 0.85);
+      --input-border: #334155;
+      --table-head-bg: rgba(15, 23, 42, 0.95);
+      --table-row-hover: rgba(30, 41, 59, 0.4);
+      --btn-sec-bg: #1e293b;
+      --btn-sec-border: #334155;
+      --btn-sec-text: #cbd5e1;
+    }
+
+    html.light {
+      --bg-color: #f8fafc;
+      --header-bg: #ffffff;
+      --sidebar-bg: #ffffff;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --modal-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --input-bg: #f1f5f9;
+      --input-border: #cbd5e1;
+      --table-head-bg: #f1f5f9;
+      --table-row-hover: #f8fafc;
+      --btn-sec-bg: #ffffff;
+      --btn-sec-border: #cbd5e1;
+      --btn-sec-text: #334155;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    header {
+      background-color: var(--header-bg) !important;
+      border-color: var(--card-border) !important;
+    }
+
+    aside {
+      background-color: var(--sidebar-bg) !important;
+      border-color: var(--card-border) !important;
+    }
+
+    .glass-panel {
+      background: var(--card-bg) !important;
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border) !important;
+      box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.05);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .glass-modal {
+      background: var(--modal-bg) !important;
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border) !important;
+      color: var(--text-main) !important;
+    }
+
+    .theme-text { color: var(--text-main) !important; }
+    .theme-muted { color: var(--text-muted) !important; }
+    
+    .theme-input {
+      background-color: var(--input-bg) !important;
+      border-color: var(--input-border) !important;
+      color: var(--text-main) !important;
+    }
+
+    .theme-btn-sec {
+      background-color: var(--btn-sec-bg) !important;
+      border-color: var(--btn-sec-border) !important;
+      color: var(--btn-sec-text) !important;
+    }
+
+    .theme-table-head {
+      background-color: var(--table-head-bg) !important;
+      color: var(--text-muted) !important;
+    }
+
+    .theme-table-row:hover {
+      background-color: var(--table-row-hover) !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+  <!-- Top Navigation Header -->
+  <header class="border-b sticky top-0 z-30 px-6 py-3.5 flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-3">
+      <img src="/logo.png" alt="Logo Dalduk" class="w-10 h-10 object-contain shrink-0 drop-shadow">
+      <div>
+        <h1 class="text-base font-bold theme-text tracking-tight">Admin & Control Panel</h1>
+        <p class="text-xs theme-muted">Sistem informasi Pengelolaan Kependudukan Perwakilan BKKBN Provinsi Banten</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <!-- Theme Switcher Button -->
+      <button id="btnThemeToggle" onclick="toggleTheme()" class="px-3.5 py-2 text-xs font-medium theme-btn-sec rounded-xl border transition flex items-center gap-2 shadow-sm" title="Switch Theme">
+        <i id="themeIcon" class="fa-solid fa-sun text-amber-400"></i>
+        <span id="themeText" class="hidden sm:inline">Light Mode</span>
+      </button>
+
+      <a href="/dashboard" target="_blank" class="text-xs font-medium theme-btn-sec px-3 py-2 rounded-xl border flex items-center gap-2 transition">
+        <i class="fa-solid fa-globe text-indigo-500"></i>
+        <span class="hidden sm:inline">Dashboard Publik</span>
+      </a>
+
+      <!-- User Profile Badge -->
+      <div class="flex items-center gap-3 glass-panel px-3.5 py-1.5 rounded-xl">
+        <div class="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs" id="userAvatar">
+          A
+        </div>
+        <div class="text-left hidden sm:block">
+          <div class="text-xs font-semibold theme-text leading-none" id="userName">Loading...</div>
+          <div class="text-[10px] text-indigo-500 mt-1 uppercase font-bold tracking-wider" id="userRoleBadge">-</div>
+        </div>
+        <button id="btnLogout" class="ml-2 theme-muted hover:text-red-500 transition p-1.5 rounded-lg hover:bg-red-500/10" title="Logout">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="flex-1 flex flex-col md:flex-row">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="w-full md:w-64 border-r p-4 shrink-0">
+      <div class="text-xs font-semibold uppercase theme-muted tracking-wider mb-3 px-3">Menu Kelola</div>
+      <nav class="space-y-1">
+        <button id="navSekolah" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition bg-indigo-600 text-white shadow-md">
+          <i class="fa-solid fa-school text-base w-5 text-center"></i>
+          <span>Kelola Data Sekolah</span>
+        </button>
+
+        <button id="navUsers" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition theme-muted hover:text-indigo-500 hover:bg-indigo-500/10">
+          <i class="fa-solid fa-users text-base w-5 text-center"></i>
+          <span>Kelola Users (RBAC)</span>
+        </button>
+      </nav>
+
+      <div class="mt-8 p-4 rounded-xl glass-panel text-xs theme-muted">
+        <div class="font-semibold theme-text mb-1"><i class="fa-solid fa-circle-info text-indigo-500 mr-1"></i> Informasi Peran</div>
+        <p id="roleDescription" class="leading-relaxed">Memuat hak akses...</p>
+      </div>
+    </aside>
+
+    <!-- Content Body -->
+    <main class="flex-1 p-6 overflow-y-auto">
+      
+      <!-- TAB 1: KELOLA DATA SEKOLAH -->
+      <section id="tabSekolah" class="space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold theme-text tracking-tight">Kelola Data Sekolah</h2>
+            <p class="text-xs theme-muted mt-1">Tambah, edit, dan hapus data sekolah yang ditampilkan pada Dashboard publik</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <button id="btnImportSekolah" onclick="openImportModal()" class="px-4 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-sky-600/20">
+              <i class="fa-solid fa-file-import"></i>
+              <span>Impor Excel / CSV</span>
+            </button>
+            <button id="btnExportSekolah" onclick="exportSekolahExcel('xls')" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-emerald-600/20">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>Ekspor Excel (.xls)</span>
+            </button>
+            <button id="btnBatchDeleteSekolah" onclick="batchDeleteSekolah()" class="px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-red-600/20 hidden">
+              <i class="fa-solid fa-trash"></i>
+              <span id="batchSekolahLabel">Hapus Terpilih (0)</span>
+            </button>
+            <button id="btnTambahSekolah" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
+              <i class="fa-solid fa-plus"></i>
+              <span>Tambah Sekolah</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filters & Search -->
+        <div class="glass-panel p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div class="relative w-full md:w-80">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 theme-muted text-sm"></i>
+            <input type="text" id="searchSekolahInput" placeholder="Cari nama, wilayah, alamat, NO..." class="w-full pl-10 pr-4 py-2 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <select id="filterJenjangSelect" class="theme-input border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500">
+              <option value="">Semua Jenjang</option>
+              <option value="SD / Sederajat">SD / Sederajat</option>
+              <option value="SMP / Sederajat">SMP / Sederajat</option>
+              <option value="SMA / Sederajat">SMA / Sederajat</option>
+            </select>
+
+            <select id="filterKlasifikasiSelect" class="theme-input border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500">
+              <option value="">Semua Klasifikasi</option>
+              <option value="Terdaftar">Terdaftar</option>
+              <option value="Dasar">Dasar</option>
+              <option value="Paripurna">Paripurna</option>
+            </select>
+
+            <select id="filterWilayahSelect" class="theme-input border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500">
+              <option value="">Semua Wilayah Banten</option>
+              <option value="Kabupaten Serang">Kabupaten Serang</option>
+              <option value="Kabupaten Tangerang">Kabupaten Tangerang</option>
+              <option value="Kabupaten Pandeglang">Kabupaten Pandeglang</option>
+              <option value="Kabupaten Lebak">Kabupaten Lebak</option>
+              <option value="Kota Serang">Kota Serang</option>
+              <option value="Kota Cilegon">Kota Cilegon</option>
+              <option value="Kota Tangerang">Kota Tangerang</option>
+              <option value="Kota Tangerang Selatan">Kota Tangerang Selatan</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Table Sekolah -->
+        <div class="glass-panel rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm theme-text">
+              <thead class="theme-table-head text-xs uppercase font-semibold border-b">
+                <tr>
+                  <th class="px-4 py-3.5 text-center w-10">
+                    <input type="checkbox" id="selectAllSekolah" onchange="toggleSelectAllSekolah(this)" class="w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500">
+                  </th>
+                  <th class="px-5 py-3.5">NO</th>
+                  <th class="px-5 py-3.5">Nama Sekolah</th>
+                  <th class="px-5 py-3.5">Jenjang</th>
+                  <th class="px-5 py-3.5">Klasifikasi</th>
+                  <th class="px-5 py-3.5">Wilayah</th>
+                  <th class="px-5 py-3.5">Alamat</th>
+                  <th class="px-5 py-3.5 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="sekolahTableBody" class="divide-y divide-slate-500/10">
+                <tr>
+                  <td colspan="7" class="px-5 py-8 text-center theme-muted">Memuat data sekolah...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Footer -->
+          <div class="px-5 py-3.5 glass-panel border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-xs theme-muted">
+            <div class="flex items-center gap-4">
+              <span id="sekolahPaginationInfo">Menampilkan 0 dari 0 data</span>
+              <div class="flex items-center gap-1.5">
+                <label for="sekolahLimitSelect">Tampilkan per halaman:</label>
+                <select id="sekolahLimitSelect" class="theme-input border rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-indigo-500">
+                  <option value="10" selected>10</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex items-center gap-2" id="sekolahPaginationBtns">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: KELOLA USERS (RBAC) -->
+      <section id="tabUsers" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold theme-text tracking-tight">Kelola Pengguna (Users & Access)</h2>
+            <p class="text-xs theme-muted mt-1">Manajemen akun pengguna dan hak akses peran (Admin, Operator Sekolah, Viewer)</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button id="btnBatchDeleteUsers" onclick="batchDeleteUsers()" class="px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-red-600/20 hidden">
+              <i class="fa-solid fa-trash"></i>
+              <span id="batchUsersLabel">Hapus Terpilih (0)</span>
+            </button>
+            <button id="btnTambahUser" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
+              <i class="fa-solid fa-user-plus"></i>
+              <span>Tambah User</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="glass-panel p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div class="relative w-full md:w-80">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 theme-muted text-sm"></i>
+            <input type="text" id="searchUserInput" placeholder="Cari username, email, nama..." class="w-full pl-10 pr-4 py-2 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+          </div>
+
+          <div class="flex items-center gap-3">
+            <select id="filterRoleSelect" class="theme-input border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500">
+              <option value="">Semua Peran (Role)</option>
+              <option value="admin">Admin</option>
+              <option value="operator_sekolah">Operator Sekolah</option>
+              <option value="viewer">Viewer</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Table Users -->
+        <div class="glass-panel rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm theme-text">
+              <thead class="theme-table-head text-xs uppercase font-semibold border-b">
+                <tr>
+                  <th class="px-4 py-3.5 text-center w-10">
+                    <input type="checkbox" id="selectAllUsers" onchange="toggleSelectAllUsers(this)" class="w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500">
+                  </th>
+                  <th class="px-5 py-3.5">ID</th>
+                  <th class="px-5 py-3.5">Pengguna</th>
+                  <th class="px-5 py-3.5">Email</th>
+                  <th class="px-5 py-3.5">Hak Akses (Role)</th>
+                  <th class="px-5 py-3.5">Status</th>
+                  <th class="px-5 py-3.5 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody" class="divide-y divide-slate-500/10">
+                <tr>
+                  <td colspan="6" class="px-5 py-8 text-center theme-muted">Memuat data pengguna...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Footer -->
+          <div class="px-5 py-3.5 glass-panel border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-xs theme-muted">
+            <div class="flex items-center gap-4">
+              <span id="usersPaginationInfo">Menampilkan 0 dari 0 pengguna</span>
+              <div class="flex items-center gap-1.5">
+                <label for="usersLimitSelect">Tampilkan per halaman:</label>
+                <select id="usersLimitSelect" class="theme-input border rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-indigo-500">
+                  <option value="10" selected>10</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex items-center gap-2" id="usersPaginationBtns">
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL: FORM SEKOLAH (TAMBAH / EDIT) -->
+  <div id="modalSekolah" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-modal w-full max-w-lg rounded-2xl p-6 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-500/20">
+        <h3 id="modalSekolahTitle" class="text-lg font-bold theme-text">Tambah Data Sekolah</h3>
+        <button id="closeModalSekolah" class="theme-muted hover:text-red-500"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <form id="formSekolah" class="mt-4 space-y-4">
+        <input type="hidden" id="sekolahNoInput">
+
+        <div>
+          <label class="block text-xs font-semibold uppercase theme-muted mb-1">Nama Sekolah</label>
+          <input type="text" id="sekolahNamaInput" required placeholder="Contoh: SMA Negeri 1 Serang" class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1">Jenjang</label>
+            <select id="sekolahJenjangInput" required class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+              <option value="SD / Sederajat">SD / Sederajat</option>
+              <option value="SMP / Sederajat">SMP / Sederajat</option>
+              <option value="SMA / Sederajat">SMA / Sederajat</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1">Klasifikasi</label>
+            <select id="sekolahKlasifikasiInput" required class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+              <option value="Terdaftar">Terdaftar</option>
+              <option value="Dasar">Dasar</option>
+              <option value="Paripurna">Paripurna</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase theme-muted mb-1">Wilayah (Kabupaten / Kota Banten)</label>
+          <select id="sekolahWilayahInput" required class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+            <option value="Kabupaten Serang">Kabupaten Serang</option>
+            <option value="Kabupaten Tangerang">Kabupaten Tangerang</option>
+            <option value="Kabupaten Pandeglang">Kabupaten Pandeglang</option>
+            <option value="Kabupaten Lebak">Kabupaten Lebak</option>
+            <option value="Kota Serang">Kota Serang</option>
+            <option value="Kota Cilegon">Kota Cilegon</option>
+            <option value="Kota Tangerang">Kota Tangerang</option>
+            <option value="Kota Tangerang Selatan">Kota Tangerang Selatan</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase theme-muted mb-1">Alamat</label>
+          <textarea id="sekolahAlamatInput" rows="2" placeholder="Jl. Raya No. 123..." class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1">Latitude (Opsional)</label>
+            <input type="text" id="sekolahLatitudeInput" placeholder="Contoh: -6.1189" class="w-full px-3.5 py-2 theme-input border rounded-xl text-xs focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1">Longitude (Opsional)</label>
+            <input type="text" id="sekolahLongitudeInput" placeholder="Contoh: 106.1528" class="w-full px-3.5 py-2 theme-input border rounded-xl text-xs focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-500/20 flex justify-end gap-3">
+          <button type="button" id="btnCancelSekolah" class="px-4 py-2 theme-btn-sec text-xs font-semibold rounded-xl border">Batal</button>
+          <button type="submit" id="btnSaveSekolah" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/30">Simpan Data</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: FORM USER (TAMBAH / EDIT) -->
+  <div id="modalUser" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-modal w-full max-w-lg rounded-2xl p-6 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-500/20">
+        <h3 id="modalUserTitle" class="text-lg font-bold theme-text">Tambah Pengguna Baru</h3>
+        <button id="closeModalUser" class="theme-muted hover:text-red-500"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <form id="formUser" class="mt-4 space-y-4">
+        <input type="hidden" id="userIdInput">
+
+        <div>
+          <label class="block text-xs font-semibold uppercase theme-muted mb-1">Nama Lengkap</label>
+          <input type="text" id="userNamaLengkapInput" required placeholder="Contoh: Budi Utomo" class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1">Username</label>
+            <input type="text" id="userUsernameInput" required placeholder="budiutomo" class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1">Email</label>
+            <input type="email" id="userEmailInput" required placeholder="budi@dalduk.go.id" class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1" id="userPasswordLabel">Password</label>
+            <div class="relative">
+              <input type="password" id="userPasswordInput" placeholder="••••••••" class="w-full pl-3.5 pr-10 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+              <button type="button" id="toggleUserPassword" class="absolute right-3 top-3 theme-muted hover:text-indigo-500 text-xs cursor-pointer">
+                <i class="fa-solid fa-eye" id="iconUserPassword"></i>
+              </button>
+            </div>
+            <p class="text-[11px] theme-muted mt-1 hidden" id="passwordHint">Kosongkan jika tidak diubah.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1" id="userConfirmPasswordLabel">Konfirmasi Password</label>
+            <div class="relative">
+              <input type="password" id="userConfirmPasswordInput" placeholder="••••••••" class="w-full pl-3.5 pr-10 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+              <button type="button" id="toggleUserConfirmPassword" class="absolute right-3 top-3 theme-muted hover:text-indigo-500 text-xs cursor-pointer">
+                <i class="fa-solid fa-eye" id="iconUserConfirmPassword"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1">Role / Hak Akses</label>
+            <select id="userRoleInput" required class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+              <option value="admin">Admin (Full Access)</option>
+              <option value="operator_sekolah">Operator Sekolah</option>
+              <option value="viewer">Viewer (Read-Only)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1">Status Akun</label>
+            <select id="userStatusInput" required class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+              <option value="true">Aktif</option>
+              <option value="false">Nonaktif</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-500/20 flex justify-end gap-3">
+          <button type="button" id="btnCancelUser" class="px-4 py-2 theme-btn-sec text-xs font-semibold rounded-xl border">Batal</button>
+          <button type="submit" id="btnSaveUser" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/30">Simpan User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: IMPOR DATA SEKOLAH -->
+  <div id="modalImportSekolah" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-modal w-full max-w-2xl rounded-2xl p-6 shadow-2xl relative max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-500/20">
+        <div>
+          <h3 class="text-lg font-bold theme-text flex items-center gap-2">
+            <i class="fa-solid fa-file-import text-sky-500"></i>
+            <span>Impor Data Sekolah</span>
+          </h3>
+          <p class="text-xs theme-muted mt-0.5">Unggah file Excel (.xlsx, .xls) atau CSV (.csv) untuk menambahkan banyak data sekaligus</p>
+        </div>
+        <button id="closeModalImport" class="theme-muted hover:text-red-500"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div class="mt-4 space-y-4 overflow-y-auto flex-1 pr-1">
+        <!-- Template Download Banner -->
+        <div class="p-3.5 bg-sky-500/10 border border-sky-500/20 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-2.5">
+            <i class="fa-solid fa-circle-info text-sky-400 text-base"></i>
+            <span class="theme-text">Belum punya format file? Unduh template contoh untuk panduan kolom.</span>
+          </div>
+          <button onclick="downloadImportTemplate()" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-lg transition shrink-0 flex items-center gap-1.5">
+            <i class="fa-solid fa-download text-xs"></i>
+            <span>Unduh Template (.xlsx)</span>
+          </button>
+        </div>
+
+        <!-- File Upload Dropzone -->
+        <div id="importDropzone" onclick="document.getElementById('importFileInput').click()" class="border-2 border-dashed border-slate-500/30 hover:border-sky-500/60 rounded-2xl p-6 text-center cursor-pointer transition bg-slate-500/5 hover:bg-sky-500/5">
+          <input type="file" id="importFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleImportFile(this.files[0])">
+          <div class="w-12 h-12 rounded-full bg-sky-500/10 text-sky-500 mx-auto flex items-center justify-center mb-3">
+            <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+          </div>
+          <p class="text-sm font-semibold theme-text">Klik atau seret file Excel / CSV ke sini</p>
+          <p class="text-xs theme-muted mt-1">Mendukung format .xlsx, .xls, dan .csv</p>
+          <div id="importFileInfo" class="mt-3 text-xs font-mono text-sky-400 font-semibold hidden"></div>
+        </div>
+
+        <!-- Preview Area -->
+        <div id="importPreviewArea" class="hidden space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold theme-text" id="previewTitle">Pratinjau Data (0 Baris)</span>
+            <span class="theme-muted">Memeriksa struktur kolom...</span>
+          </div>
+
+          <div class="max-h-48 overflow-x-auto overflow-y-auto border border-slate-500/20 rounded-xl">
+            <table class="w-full text-left text-xs theme-text">
+              <thead class="theme-table-head font-semibold sticky top-0 border-b">
+                <tr>
+                  <th class="px-3 py-2">Nama Sekolah</th>
+                  <th class="px-3 py-2">Jenjang</th>
+                  <th class="px-3 py-2">Klasifikasi</th>
+                  <th class="px-3 py-2">Wilayah</th>
+                  <th class="px-3 py-2">Alamat</th>
+                </tr>
+              </thead>
+              <tbody id="importPreviewTbody" class="divide-y divide-slate-500/10">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-4 mt-4 border-t border-slate-500/20 flex justify-end gap-3">
+        <button type="button" id="btnCancelImport" class="px-4 py-2 theme-btn-sec text-xs font-semibold rounded-xl border">Batal</button>
+        <button type="button" id="btnSubmitImport" onclick="submitImportSekolah()" disabled class="px-5 py-2 bg-sky-600 hover:bg-sky-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-xl shadow-lg shadow-sky-600/30">
+          Proses Impor Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT CLIENT-SIDE LOGIC -->
+  <script>
+    let currentUser = null;
+    let sekolahState = { page: 1, limit: 10, totalPages: 1 };
+    let usersState = { page: 1, limit: 10, totalPages: 1 };
+
+    // Theme Management
+    function initTheme() {
+      const savedTheme = localStorage.getItem('app_theme') || 'dark';
+      applyTheme(savedTheme);
+    }
+
+    function applyTheme(theme) {
+      const htmlEl = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      const themeText = document.getElementById('themeText');
+
+      if (theme === 'light') {
+        htmlEl.classList.add('light');
+        if (themeIcon) themeIcon.className = 'fa-solid fa-moon text-indigo-600';
+        if (themeText) themeText.innerText = 'Dark Mode';
+      } else {
+        htmlEl.classList.remove('light');
+        if (themeIcon) themeIcon.className = 'fa-solid fa-sun text-amber-400';
+        if (themeText) themeText.innerText = 'Light Mode';
+      }
+      localStorage.setItem('app_theme', theme);
+    }
+
+    function toggleTheme() {
+      const currentTheme = localStorage.getItem('app_theme') || 'dark';
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      applyTheme(newTheme);
+    }
+
+    initTheme();
+
+    // Auth Token Check
+    async function checkAuth() {
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          localStorage.removeItem('auth_token');
+          window.location.href = '/login';
+          return;
+        }
+
+        currentUser = data.user;
+        renderUserProfile();
+      } catch (e) {
+        window.location.href = '/login';
+      }
+    }
+
+    function renderUserProfile() {
+      if (!currentUser) return;
+      document.getElementById('userName').innerText = currentUser.namaLengkap || currentUser.username;
+      document.getElementById('userAvatar').innerText = (currentUser.namaLengkap || currentUser.username).charAt(0).toUpperCase();
+
+      const badge = document.getElementById('userRoleBadge');
+      const roleDesc = document.getElementById('roleDescription');
+      const navUsers = document.getElementById('navUsers');
+
+      if (currentUser.roleId === 'admin') {
+        badge.innerText = 'Administrator';
+        badge.className = 'text-[10px] text-emerald-500 mt-1 uppercase font-bold tracking-wider';
+        roleDesc.innerHTML = 'Status: <strong class="text-emerald-500">Admin</strong>.<br>Anda memiliki hak akses penuh (CRUD Sekolah & Users).';
+      } else if (currentUser.roleId === 'operator_sekolah') {
+        badge.innerText = 'Operator Sekolah';
+        badge.className = 'text-[10px] text-sky-500 mt-1 uppercase font-bold tracking-wider';
+        roleDesc.innerHTML = 'Status: <strong class="text-sky-500">Operator Sekolah</strong>.<br>Dapat mengelola (CRUD) data sekolah.';
+        navUsers.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        badge.innerText = 'Viewer';
+        badge.className = 'text-[10px] theme-muted mt-1 uppercase font-bold tracking-wider';
+        roleDesc.innerHTML = 'Status: <strong class="theme-muted">Viewer</strong>.<br>Hanya dapat melihat data.';
+        navUsers.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    // Navigation Tabs
+    const navSekolah = document.getElementById('navSekolah');
+    const navUsers = document.getElementById('navUsers');
+    const tabSekolah = document.getElementById('tabSekolah');
+    const tabUsers = document.getElementById('tabUsers');
+
+    navSekolah.addEventListener('click', () => {
+      navSekolah.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition bg-indigo-600 text-white shadow-md';
+      navUsers.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition theme-muted hover:text-indigo-500 hover:bg-indigo-500/10';
+      tabSekolah.classList.remove('hidden');
+      tabUsers.classList.add('hidden');
+      loadSekolahData();
+    });
+
+    navUsers.addEventListener('click', () => {
+      if (currentUser.roleId !== 'admin') {
+        alert('Akses Ditolak: Hanya Administrator yang dapat mengakses Kelola Users.');
+        return;
+      }
+      navUsers.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition bg-indigo-600 text-white shadow-md';
+      navSekolah.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition theme-muted hover:text-indigo-500 hover:bg-indigo-500/10';
+      tabUsers.classList.remove('hidden');
+      tabSekolah.classList.add('hidden');
+      loadUsersData();
+    });
+
+    // Logout
+    document.getElementById('btnLogout').addEventListener('click', async () => {
+      if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_info');
+        window.location.href = '/login';
+      }
+    });
+
+    // --- SEKOLAH DATA MANAGEMENT ---
+    async function loadSekolahData(page = 1) {
+      const search = document.getElementById('searchSekolahInput').value.trim();
+      const jenjang = document.getElementById('filterJenjangSelect').value;
+      const klasifikasi = document.getElementById('filterKlasifikasiSelect').value;
+      const wilayah = document.getElementById('filterWilayahSelect').value;
+
+      const url = new URL('/api/sekolah', window.location.origin);
+      url.searchParams.set('page', page);
+      url.searchParams.set('limit', sekolahState.limit);
+      if (search) url.searchParams.set('search', search);
+      if (jenjang) url.searchParams.set('jenjang', jenjang);
+      if (klasifikasi) url.searchParams.set('klasifikasi', klasifikasi);
+      if (wilayah) url.searchParams.set('wilayah', wilayah);
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.success) {
+          sekolahState.page = data.pagination.page;
+          sekolahState.totalPages = data.pagination.totalPages;
+          renderSekolahTable(data.data);
+          renderSekolahPagination(data.pagination);
+        }
+      } catch (e) {
+        console.error('Error loading sekolah:', e);
+      }
+    }
+
+    function renderSekolahTable(items) {
+      const tbody = document.getElementById('sekolahTableBody');
+      const selectAll = document.getElementById('selectAllSekolah');
+      if (selectAll) selectAll.checked = false;
+      updateSekolahBatchState();
+
+      if (!items || items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="px-5 py-8 text-center theme-muted">Tidak ada data sekolah ditemukan.</td></tr>`;
+        return;
+      }
+
+      const isReadOnly = currentUser?.roleId === 'viewer';
+
+      tbody.innerHTML = items.map(item => `
+        <tr class="theme-table-row transition">
+          <td class="px-4 py-3 text-center">
+            ${isReadOnly ? '' : `<input type="checkbox" value="${item.no}" class="cb-sekolah w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500" onchange="updateSekolahBatchState()">`}
+          </td>
+          <td class="px-5 py-3 font-mono text-xs text-indigo-500 font-bold">${item.no}</td>
+          <td class="px-5 py-3 font-medium theme-text">${item.namaSekolah}</td>
+          <td class="px-5 py-3 text-xs theme-text">${item.jenjang}</td>
+          <td class="px-5 py-3">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold ${
+              item.klasifikasi === 'Paripurna' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/30' :
+              item.klasifikasi === 'Dasar' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/30' :
+              'bg-slate-500/10 text-slate-500 border border-slate-500/30'
+            }">${item.klasifikasi}</span>
+          </td>
+          <td class="px-5 py-3 text-xs theme-muted">${item.wilayah}</td>
+          <td class="px-5 py-3 text-xs theme-muted max-w-xs truncate">${item.alamat || '-'}</td>
+          <td class="px-5 py-3 text-center">
+            ${isReadOnly ? '<span class="text-xs theme-muted">Read-only</span>' : `
+              <div class="flex items-center justify-center gap-2">
+                <button onclick="editSekolah(${item.no}, '${encodeURIComponent(JSON.stringify(item))}')" class="p-1.5 theme-btn-sec rounded-lg border transition hover:text-indigo-500" title="Edit">
+                  <i class="fa-solid fa-pen-to-square text-xs"></i>
+                </button>
+                <button onclick="deleteSekolah(${item.no})" class="p-1.5 theme-btn-sec rounded-lg border transition hover:text-red-500" title="Hapus">
+                  <i class="fa-solid fa-trash-can text-xs"></i>
+                </button>
+              </div>
+            `}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderSekolahPagination(pg) {
+      document.getElementById('sekolahPaginationInfo').innerText = `Menampilkan ${pg.totalItems === 0 ? 0 : (pg.page - 1) * pg.limit + 1} - ${Math.min(pg.page * pg.limit, pg.totalItems)} dari ${pg.totalItems} sekolah`;
+      
+      const container = document.getElementById('sekolahPaginationBtns');
+      let html = '';
+      if (pg.page > 1) {
+        html += `<button onclick="loadSekolahData(${pg.page - 1})" class="px-3 py-1 theme-btn-sec border rounded-lg">Prev</button>`;
+      }
+      for (let i = 1; i <= pg.totalPages; i++) {
+        html += `<button onclick="loadSekolahData(${i})" class="px-3 py-1 rounded-lg ${i === pg.page ? 'bg-indigo-600 text-white font-bold' : 'theme-btn-sec border'}">${i}</button>`;
+      }
+      if (pg.page < pg.totalPages) {
+        html += `<button onclick="loadSekolahData(${pg.page + 1})" class="px-3 py-1 theme-btn-sec border rounded-lg">Next</button>`;
+      }
+      container.innerHTML = html;
+    }
+
+    // Modal Sekolah Form Handlers
+    const modalSekolah = document.getElementById('modalSekolah');
+    document.getElementById('btnTambahSekolah').addEventListener('click', () => {
+      if (currentUser?.roleId === 'viewer') return alert('Hak akses Viewer tidak diperbolehkan menambah data.');
+      document.getElementById('modalSekolahTitle').innerText = 'Tambah Data Sekolah';
+      document.getElementById('formSekolah').reset();
+      document.getElementById('sekolahNoInput').value = '';
+      modalSekolah.classList.remove('hidden');
+    });
+
+    document.getElementById('closeModalSekolah').addEventListener('click', () => modalSekolah.classList.add('hidden'));
+    document.getElementById('btnCancelSekolah').addEventListener('click', () => modalSekolah.classList.add('hidden'));
+
+    window.editSekolah = function(no, encodedObj) {
+      const item = JSON.parse(decodeURIComponent(encodedObj));
+      document.getElementById('modalSekolahTitle').innerText = `Edit Data Sekolah (NO: ${no})`;
+      document.getElementById('sekolahNoInput').value = item.no;
+      document.getElementById('sekolahNamaInput').value = item.namaSekolah;
+      document.getElementById('sekolahJenjangInput').value = item.jenjang;
+      document.getElementById('sekolahKlasifikasiInput').value = item.klasifikasi;
+      document.getElementById('sekolahWilayahInput').value = item.wilayah;
+      document.getElementById('sekolahAlamatInput').value = item.alamat || '';
+      document.getElementById('sekolahLatitudeInput').value = item.latitude || '';
+      document.getElementById('sekolahLongitudeInput').value = item.longitude || '';
+      modalSekolah.classList.remove('hidden');
+    };
+
+    window.deleteSekolah = async function(no) {
+      if (!confirm(`Apakah Anda yakin ingin menghapus data sekolah dengan NO ${no}?`)) return;
+      const token = localStorage.getItem('auth_token');
+      try {
+        const res = await fetch(`/api/sekolah/${no}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+          alert(result.message);
+          loadSekolahData(sekolahState.page);
+        } else {
+          alert(result.error || 'Gagal menghapus sekolah.');
+        }
+      } catch (e) {
+        alert('Terjadi kesalahan sistem.');
+      }
+    };
+
+    document.getElementById('formSekolah').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const no = document.getElementById('sekolahNoInput').value;
+      const token = localStorage.getItem('auth_token');
+
+      const payload = {
+        namaSekolah: document.getElementById('sekolahNamaInput').value.trim(),
+        jenjang: document.getElementById('sekolahJenjangInput').value,
+        klasifikasi: document.getElementById('sekolahKlasifikasiInput').value,
+        wilayah: document.getElementById('sekolahWilayahInput').value,
+        alamat: document.getElementById('sekolahAlamatInput').value.trim(),
+        latitude: document.getElementById('sekolahLatitudeInput').value.trim() || null,
+        longitude: document.getElementById('sekolahLongitudeInput').value.trim() || null,
+      };
+
+      const url = no ? `/api/sekolah/${no}` : '/api/sekolah';
+      const method = no ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+
+        if (res.ok && result.success) {
+          alert(result.message);
+          modalSekolah.classList.add('hidden');
+          loadSekolahData(sekolahState.page);
+        } else {
+          alert(result.error || 'Gagal menyimpan data.');
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan koneksi.');
+      }
+    });
+
+    // --- USERS DATA MANAGEMENT ---
+    async function loadUsersData(page = 1) {
+      const search = document.getElementById('searchUserInput').value.trim();
+      const role = document.getElementById('filterRoleSelect').value;
+      const token = localStorage.getItem('auth_token');
+
+      const url = new URL('/api/users', window.location.origin);
+      url.searchParams.set('page', page);
+      url.searchParams.set('limit', usersState.limit);
+      if (search) url.searchParams.set('search', search);
+      if (role) url.searchParams.set('role', role);
+
+      try {
+        const res = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          usersState.page = data.pagination.page;
+          usersState.totalPages = data.pagination.totalPages;
+          renderUsersTable(data.data);
+          renderUsersPagination(data.pagination);
+        }
+      } catch (e) {
+        console.error('Error loading users:', e);
+      }
+    }
+
+    function renderUsersTable(items) {
+      const tbody = document.getElementById('usersTableBody');
+      const selectAll = document.getElementById('selectAllUsers');
+      if (selectAll) selectAll.checked = false;
+      updateUsersBatchState();
+
+      if (!items || items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="px-5 py-8 text-center theme-muted">Tidak ada pengguna ditemukan.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = items.map(u => `
+        <tr class="theme-table-row transition">
+          <td class="px-4 py-3 text-center">
+            <input type="checkbox" value="${u.idUser}" class="cb-user w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500" onchange="updateUsersBatchState()" ${u.idUser === currentUser?.idUser ? 'disabled title="Tidak dapat memilih akun sendiri"' : ''}>
+          </td>
+          <td class="px-5 py-3 font-mono text-xs text-indigo-500 font-bold">#${u.idUser}</td>
+          <td class="px-5 py-3">
+            <div class="font-medium theme-text">${u.namaLengkap}</div>
+            <div class="text-xs theme-muted font-mono">@${u.username}</div>
+          </td>
+          <td class="px-5 py-3 text-xs theme-muted">${u.email}</td>
+          <td class="px-5 py-3 text-xs">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold ${
+              u.roleId === 'admin' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/30' :
+              u.roleId === 'operator_sekolah' ? 'bg-sky-500/10 text-sky-500 border border-sky-500/30' :
+              'bg-slate-500/10 text-slate-500 border border-slate-500/30'
+            }">${u.roleId}</span>
+          </td>
+          <td class="px-5 py-3 text-xs">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.isActive ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'}">
+              ${u.isActive ? 'AKTIF' : 'NONAKTIF'}
+            </span>
+          </td>
+          <td class="px-5 py-3 text-center">
+            <div class="flex items-center justify-center gap-2">
+              <button onclick="editUser(${u.idUser}, '${encodeURIComponent(JSON.stringify(u))}')" class="p-1.5 theme-btn-sec rounded-lg border transition hover:text-indigo-500" title="Edit / Reset Password">
+                <i class="fa-solid fa-user-pen text-xs"></i>
+              </button>
+              ${u.idUser === currentUser?.idUser ? '' : `
+                <button onclick="deleteUser(${u.idUser}, '${u.username}')" class="p-1.5 theme-btn-sec rounded-lg border transition hover:text-red-500" title="Hapus">
+                  <i class="fa-solid fa-trash-can text-xs"></i>
+                </button>
+              `}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderUsersPagination(pg) {
+      document.getElementById('usersPaginationInfo').innerText = `Menampilkan ${pg.totalItems === 0 ? 0 : (pg.page - 1) * pg.limit + 1} - ${Math.min(pg.page * pg.limit, pg.totalItems)} dari ${pg.totalItems} pengguna`;
+      
+      const container = document.getElementById('usersPaginationBtns');
+      let html = '';
+      if (pg.page > 1) {
+        html += `<button onclick="loadUsersData(${pg.page - 1})" class="px-3 py-1 theme-btn-sec border rounded-lg">Prev</button>`;
+      }
+      for (let i = 1; i <= pg.totalPages; i++) {
+        html += `<button onclick="loadUsersData(${i})" class="px-3 py-1 rounded-lg ${i === pg.page ? 'bg-indigo-600 text-white font-bold' : 'theme-btn-sec border'}">${i}</button>`;
+      }
+      if (pg.page < pg.totalPages) {
+        html += `<button onclick="loadUsersData(${pg.page + 1})" class="px-3 py-1 theme-btn-sec border rounded-lg">Next</button>`;
+      }
+      container.innerHTML = html;
+    }
+
+    // Modal User Handlers & Password Toggles
+    const modalUser = document.getElementById('modalUser');
+
+    function resetPasswordVisibility() {
+      const pInput = document.getElementById('userPasswordInput');
+      const pIcon = document.getElementById('iconUserPassword');
+      const cInput = document.getElementById('userConfirmPasswordInput');
+      const cIcon = document.getElementById('iconUserConfirmPassword');
+
+      pInput.type = 'password';
+      pIcon.className = 'fa-solid fa-eye';
+      cInput.type = 'password';
+      cIcon.className = 'fa-solid fa-eye';
+    }
+
+    document.getElementById('toggleUserPassword').addEventListener('click', () => {
+      const input = document.getElementById('userPasswordInput');
+      const icon = document.getElementById('iconUserPassword');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+      }
+    });
+
+    document.getElementById('toggleUserConfirmPassword').addEventListener('click', () => {
+      const input = document.getElementById('userConfirmPasswordInput');
+      const icon = document.getElementById('iconUserConfirmPassword');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+      }
+    });
+
+    document.getElementById('btnTambahUser').addEventListener('click', () => {
+      document.getElementById('modalUserTitle').innerText = 'Tambah Pengguna Baru';
+      document.getElementById('formUser').reset();
+      document.getElementById('userIdInput').value = '';
+      document.getElementById('userUsernameInput').readOnly = false;
+      document.getElementById('userPasswordInput').required = true;
+      document.getElementById('userConfirmPasswordInput').required = true;
+      document.getElementById('passwordHint').classList.add('hidden');
+      resetPasswordVisibility();
+      modalUser.classList.remove('hidden');
+    });
+
+    document.getElementById('closeModalUser').addEventListener('click', () => modalUser.classList.add('hidden'));
+    document.getElementById('btnCancelUser').addEventListener('click', () => modalUser.classList.add('hidden'));
+
+    window.editUser = function(idUser, encodedObj) {
+      const u = JSON.parse(decodeURIComponent(encodedObj));
+      document.getElementById('modalUserTitle').innerText = `Edit Pengguna (@${u.username})`;
+      document.getElementById('userIdInput').value = u.idUser;
+      document.getElementById('userNamaLengkapInput').value = u.namaLengkap;
+      document.getElementById('userUsernameInput').value = u.username;
+      document.getElementById('userUsernameInput').readOnly = true;
+      document.getElementById('userEmailInput').value = u.email;
+      document.getElementById('userPasswordInput').value = '';
+      document.getElementById('userConfirmPasswordInput').value = '';
+      document.getElementById('userPasswordInput').required = false;
+      document.getElementById('userConfirmPasswordInput').required = false;
+      document.getElementById('passwordHint').classList.remove('hidden');
+      document.getElementById('userRoleInput').value = u.roleId;
+      document.getElementById('userStatusInput').value = u.isActive ? 'true' : 'false';
+      resetPasswordVisibility();
+      modalUser.classList.remove('hidden');
+    };
+
+    window.deleteUser = async function(idUser, username) {
+      if (!confirm(`Apakah Anda yakin ingin menghapus pengguna @${username}?`)) return;
+      const token = localStorage.getItem('auth_token');
+      try {
+        const res = await fetch(`/api/users/${idUser}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+          alert(result.message);
+          loadUsersData(usersState.page);
+        } else {
+          alert(result.error || 'Gagal menghapus pengguna.');
+        }
+      } catch (e) {
+        alert('Terjadi kesalahan sistem.');
+      }
+    };
+
+    document.getElementById('formUser').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const idUser = document.getElementById('userIdInput').value;
+      const token = localStorage.getItem('auth_token');
+      const password = document.getElementById('userPasswordInput').value;
+      const confirmPassword = document.getElementById('userConfirmPasswordInput').value;
+
+      if (!idUser) {
+        if (!password) {
+          alert('Password wajib diisi untuk pengguna baru.');
+          return;
+        }
+        if (password !== confirmPassword) {
+          alert('Konfirmasi password tidak cocok dengan password yang dimasukkan!');
+          return;
+        }
+      } else {
+        if (password || confirmPassword) {
+          if (password !== confirmPassword) {
+            alert('Konfirmasi password baru tidak cocok dengan password yang dimasukkan!');
+            return;
+          }
+        }
+      }
+
+      const payload = {
+        namaLengkap: document.getElementById('userNamaLengkapInput').value.trim(),
+        username: document.getElementById('userUsernameInput').value.trim(),
+        email: document.getElementById('userEmailInput').value.trim(),
+        password: password,
+        roleId: document.getElementById('userRoleInput').value,
+        isActive: document.getElementById('userStatusInput').value === 'true',
+      };
+
+      if (idUser && !payload.password) {
+        delete payload.password;
+      }
+
+      const url = idUser ? `/api/users/${idUser}` : '/api/users';
+      const method = idUser ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+
+        if (res.ok && result.success) {
+          alert(result.message);
+          modalUser.classList.add('hidden');
+          loadUsersData(usersState.page);
+        } else {
+          alert(result.error || 'Gagal menyimpan pengguna.');
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan koneksi.');
+      }
+    });
+
+    // --- EXCEL EXPORT LOGIC FOR SEKOLAH (.xls) ---
+    async function exportSekolahExcel(format = 'xls') {
+      const search = document.getElementById('searchSekolahInput').value.trim();
+      const jenjang = document.getElementById('filterJenjangSelect').value;
+      const klasifikasi = document.getElementById('filterKlasifikasiSelect').value;
+      const wilayah = document.getElementById('filterWilayahSelect').value;
+
+      const url = new URL('/api/sekolah', window.location.origin);
+      url.searchParams.set('page', 1);
+      url.searchParams.set('limit', 99999);
+      if (search) url.searchParams.set('search', search);
+      if (jenjang) url.searchParams.set('jenjang', jenjang);
+      if (klasifikasi) url.searchParams.set('klasifikasi', klasifikasi);
+      if (wilayah) url.searchParams.set('wilayah', wilayah);
+
+      try {
+        const res = await fetch(url);
+        const result = await res.json();
+        if (!result.success || !result.data || result.data.length === 0) {
+          alert('Tidak ada data sekolah untuk diekspor.');
+          return;
+        }
+
+        const excelData = result.data.map(item => ({
+          'NO': item.no,
+          'Nama Sekolah': item.namaSekolah,
+          'Jenjang': item.jenjang,
+          'Klasifikasi': item.klasifikasi,
+          'Wilayah': item.wilayah,
+          'Alamat': item.alamat || '-',
+          'Tanggal Dibuat': item.createdAt ? new Date(item.createdAt).toLocaleDateString('id-ID') : '-'
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Data Sekolah");
+
+        const ext = format === 'xlsx' ? 'xlsx' : 'xls';
+        const filename = `Data_Sekolah_Dalduk_Banten_${new Date().toISOString().slice(0, 10)}.${ext}`;
+        
+        if (ext === 'xls') {
+          XLSX.writeFile(workbook, filename, { bookType: 'biff8' });
+        } else {
+          XLSX.writeFile(workbook, filename);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Terjadi kesalahan saat mengunduh file Excel.');
+      }
+    }
+
+    // Helper function for HTML escaping
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // --- BATCH IMPOR LOGIC FOR SEKOLAH ---
+    let parsedImportItems = [];
+
+    function openImportModal() {
+      if (currentUser?.roleId === 'viewer') return alert('Hak akses Viewer tidak diperbolehkan mengimpor data.');
+      parsedImportItems = [];
+      document.getElementById('importFileInput').value = '';
+      document.getElementById('importFileInfo').classList.add('hidden');
+      document.getElementById('importPreviewArea').classList.add('hidden');
+      const btnSubmit = document.getElementById('btnSubmitImport');
+      btnSubmit.disabled = true;
+      btnSubmit.innerText = 'Proses Impor Data';
+      document.getElementById('modalImportSekolah').classList.remove('hidden');
+    }
+
+    document.getElementById('closeModalImport')?.addEventListener('click', () => document.getElementById('modalImportSekolah').classList.add('hidden'));
+    document.getElementById('btnCancelImport')?.addEventListener('click', () => document.getElementById('modalImportSekolah').classList.add('hidden'));
+
+    function downloadImportTemplate() {
+      const templateData = [
+        {
+          'Nama Sekolah': 'SMA Negeri 1 Serang',
+          'Jenjang': 'SMA / Sederajat',
+          'Klasifikasi': 'Paripurna',
+          'Wilayah': 'Kota Serang',
+          'Alamat': 'Jl. Ahmad Yani No. 130, Serang'
+        },
+        {
+          'Nama Sekolah': 'SMP Negeri 1 Tangerang',
+          'Jenjang': 'SMP / Sederajat',
+          'Klasifikasi': 'Dasar',
+          'Wilayah': 'Kota Tangerang',
+          'Alamat': 'Jl. Daan Mogot No. 12'
+        },
+        {
+          'Nama Sekolah': 'SD Negeri 1 Cilegon',
+          'Jenjang': 'SD / Sederajat',
+          'Klasifikasi': 'Terdaftar',
+          'Wilayah': 'Kota Cilegon',
+          'Alamat': 'Jl. Jend. Sudirman No. 45'
+        }
+      ];
+
+      const worksheet = XLSX.utils.json_to_sheet(templateData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Template");
+
+      worksheet['!cols'] = [
+        { wch: 30 },
+        { wch: 18 },
+        { wch: 15 },
+        { wch: 25 },
+        { wch: 40 }
+      ];
+
+      XLSX.writeFile(workbook, "Template_Impor_Sekolah_Dalduk.xlsx");
+    }
+
+    function handleImportFile(file) {
+      if (!file) return;
+
+      const fileInfo = document.getElementById('importFileInfo');
+      fileInfo.innerText = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      fileInfo.classList.remove('hidden');
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const rawRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
+
+          if (!rawRows || rawRows.length === 0) {
+            alert('File yang diunggah kosong atau tidak memiliki data.');
+            return;
+          }
+
+          // Normalize row key mappings
+          parsedImportItems = rawRows.map(row => {
+            const keys = Object.keys(row);
+            const getVal = (possibleKeys) => {
+              const matchedKey = keys.find(k => possibleKeys.some(pk => k.toLowerCase().replace(/[^a-z]/g, '').includes(pk)));
+              return matchedKey ? String(row[matchedKey] || '').trim() : '';
+            };
+
+            return {
+              namaSekolah: getVal(['namasekolah', 'nama', 'sekolah']),
+              jenjang: getVal(['jenjang', 'tingkat']),
+              klasifikasi: getVal(['klasifikasi', 'status']),
+              wilayah: getVal(['wilayah', 'kabupaten', 'kota']),
+              alamat: getVal(['alamat', 'lokasi'])
+            };
+          }).filter(item => item.namaSekolah.length > 0);
+
+          if (parsedImportItems.length === 0) {
+            alert('Tidak ditemukan kolom "Nama Sekolah" yang valid pada file.');
+            return;
+          }
+
+          renderImportPreview();
+        } catch (err) {
+          console.error(err);
+          alert('Gagal membaca file Excel/CSV. Pastikan format file benar.');
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+
+    function renderImportPreview() {
+      const area = document.getElementById('importPreviewArea');
+      const title = document.getElementById('previewTitle');
+      const tbody = document.getElementById('importPreviewTbody');
+      const btnSubmit = document.getElementById('btnSubmitImport');
+
+      title.innerText = `Pratinjau Data (${parsedImportItems.length} Sekolah Siap Diimpor)`;
+
+      tbody.innerHTML = parsedImportItems.slice(0, 10).map(item => `
+        <tr class="theme-table-row">
+          <td class="px-3 py-2 font-medium theme-text">${escapeHtml(item.namaSekolah)}</td>
+          <td class="px-3 py-2 theme-muted">${escapeHtml(item.jenjang || 'SD / Sederajat')}</td>
+          <td class="px-3 py-2 theme-muted">${escapeHtml(item.klasifikasi || 'Terdaftar')}</td>
+          <td class="px-3 py-2 theme-muted">${escapeHtml(item.wilayah || 'Kota Serang')}</td>
+          <td class="px-3 py-2 theme-muted truncate max-w-[150px]">${escapeHtml(item.alamat || '-')}</td>
+        </tr>
+      `).join('');
+
+      area.classList.remove('hidden');
+      btnSubmit.disabled = false;
+      btnSubmit.innerText = `Proses Impor ${parsedImportItems.length} Data`;
+    }
+
+    async function submitImportSekolah() {
+      if (parsedImportItems.length === 0) return;
+
+      const token = localStorage.getItem('auth_token');
+      const btnSubmit = document.getElementById('btnSubmitImport');
+      btnSubmit.disabled = true;
+      btnSubmit.innerText = 'Mengimpor...';
+
+      try {
+        const res = await fetch('/api/sekolah/batch-import', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ items: parsedImportItems })
+        });
+
+        const result = await res.json();
+        if (res.ok && result.success) {
+          alert(result.message);
+          document.getElementById('modalImportSekolah').classList.add('hidden');
+          loadSekolahData(1);
+        } else {
+          alert(result.error || 'Gagal mengimpor data sekolah.');
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan koneksi.');
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.innerText = `Proses Impor ${parsedImportItems.length} Data`;
+      }
+    }
+
+    // --- BATCH DELETE LOGIC FOR SEKOLAH ---
+    function toggleSelectAllSekolah(master) {
+      const checkboxes = document.querySelectorAll('.cb-sekolah');
+      checkboxes.forEach(cb => cb.checked = master.checked);
+      updateSekolahBatchState();
+    }
+
+    function updateSekolahBatchState() {
+      const selected = Array.from(document.querySelectorAll('.cb-sekolah:checked')).map(cb => Number(cb.value));
+      const btnBatch = document.getElementById('btnBatchDeleteSekolah');
+      const labelBatch = document.getElementById('batchSekolahLabel');
+      const master = document.getElementById('selectAllSekolah');
+      const allCheckboxes = document.querySelectorAll('.cb-sekolah');
+
+      if (master && allCheckboxes.length > 0 && selected.length === allCheckboxes.length) {
+        master.checked = true;
+      } else if (master) {
+        master.checked = false;
+      }
+
+      if (btnBatch && labelBatch) {
+        if (selected.length > 0) {
+          btnBatch.classList.remove('hidden');
+          labelBatch.innerText = `Hapus Terpilih (${selected.length})`;
+        } else {
+          btnBatch.classList.add('hidden');
+        }
+      }
+    }
+
+    async function batchDeleteSekolah() {
+      const selected = Array.from(document.querySelectorAll('.cb-sekolah:checked')).map(cb => Number(cb.value));
+      if (selected.length === 0) return;
+
+      if (!confirm(`Apakah Anda yakin ingin menghapus ${selected.length} data sekolah yang dipilih?`)) return;
+
+      const token = localStorage.getItem('auth_token');
+      try {
+        const res = await fetch('/api/sekolah/batch-delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ nos: selected })
+        });
+
+        const result = await res.json();
+        if (res.ok && result.success) {
+          alert(result.message);
+          const master = document.getElementById('selectAllSekolah');
+          if (master) master.checked = false;
+          updateSekolahBatchState();
+          loadSekolahData(sekolahState.page);
+        } else {
+          alert(result.error || 'Gagal menghapus data sekolah terpilih.');
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan koneksi.');
+      }
+    }
+
+    // --- BATCH DELETE LOGIC FOR USERS ---
+    function toggleSelectAllUsers(master) {
+      const checkboxes = document.querySelectorAll('.cb-user:not(:disabled)');
+      checkboxes.forEach(cb => cb.checked = master.checked);
+      updateUsersBatchState();
+    }
+
+    function updateUsersBatchState() {
+      const selected = Array.from(document.querySelectorAll('.cb-user:checked')).map(cb => Number(cb.value));
+      const btnBatch = document.getElementById('btnBatchDeleteUsers');
+      const labelBatch = document.getElementById('batchUsersLabel');
+      const master = document.getElementById('selectAllUsers');
+      const allCheckboxes = document.querySelectorAll('.cb-user:not(:disabled)');
+
+      if (master && allCheckboxes.length > 0 && selected.length === allCheckboxes.length) {
+        master.checked = true;
+      } else if (master) {
+        master.checked = false;
+      }
+
+      if (btnBatch && labelBatch) {
+        if (selected.length > 0) {
+          btnBatch.classList.remove('hidden');
+          labelBatch.innerText = `Hapus Terpilih (${selected.length})`;
+        } else {
+          btnBatch.classList.add('hidden');
+        }
+      }
+    }
+
+    async function batchDeleteUsers() {
+      const selected = Array.from(document.querySelectorAll('.cb-user:checked')).map(cb => Number(cb.value));
+      if (selected.length === 0) return;
+
+      if (!confirm(`Apakah Anda yakin ingin menghapus ${selected.length} pengguna yang dipilih?`)) return;
+
+      const token = localStorage.getItem('auth_token');
+      try {
+        const res = await fetch('/api/users/batch-delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ ids: selected })
+        });
+
+        const result = await res.json();
+        if (res.ok && result.success) {
+          alert(result.message);
+          const master = document.getElementById('selectAllUsers');
+          if (master) master.checked = false;
+          updateUsersBatchState();
+          loadUsersData(usersState.page);
+        } else {
+          alert(result.error || 'Gagal menghapus pengguna terpilih.');
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan koneksi.');
+      }
+    }
+
+    // Event Listeners for Filters & Search & Pagination Limits
+    document.getElementById('searchSekolahInput')?.addEventListener('input', () => loadSekolahData(1));
+    document.getElementById('filterJenjangSelect')?.addEventListener('change', () => loadSekolahData(1));
+    document.getElementById('filterKlasifikasiSelect')?.addEventListener('change', () => loadSekolahData(1));
+    document.getElementById('filterWilayahSelect')?.addEventListener('change', () => loadSekolahData(1));
+    document.getElementById('sekolahLimitSelect')?.addEventListener('change', (e) => {
+      sekolahState.limit = parseInt(e.target.value, 10);
+      loadSekolahData(1);
+    });
+
+    document.getElementById('searchUserInput')?.addEventListener('input', () => loadUsersData(1));
+    document.getElementById('filterRoleSelect')?.addEventListener('change', () => loadUsersData(1));
+    document.getElementById('usersLimitSelect')?.addEventListener('change', (e) => {
+      usersState.limit = parseInt(e.target.value, 10);
+      loadUsersData(1);
+    });
+
+    // Initialize on Load
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await checkAuth();
+      } catch (e) {
+        console.error('Auth check error:', e);
+      }
+      loadSekolahData(1);
+    });
+  </script>
+</body>
+</html>
