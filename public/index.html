@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Pemetaan Data Sekolah - Dalduk</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Leaflet.js CSS & JS CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --text-color: #f8fafc;
+      --card-bg: rgba(30, 41, 59, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --title-color: #ffffff;
+      --sub-color: #94a3b8;
+      --input-bg: rgba(15, 23, 42, 0.85);
+      --input-border: #334155;
+      --input-text: #f8fafc;
+      --table-head-bg: rgba(15, 23, 42, 0.95);
+      --table-row-hover: rgba(30, 41, 59, 0.5);
+      --table-border: rgba(255, 255, 255, 0.06);
+      --popup-bg: #1e293b;
+      --popup-text: #f8fafc;
+      --btn-secondary-bg: #1e293b;
+      --btn-secondary-border: #334155;
+      --btn-secondary-text: #cbd5e1;
+    }
+
+    html.light {
+      --bg-color: #f1f5f9;
+      --text-color: #0f172a;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --title-color: #0f172a;
+      --sub-color: #64748b;
+      --input-bg: #ffffff;
+      --input-border: #cbd5e1;
+      --input-text: #0f172a;
+      --table-head-bg: #e2e8f0;
+      --table-row-hover: rgba(226, 232, 240, 0.6);
+      --table-border: #cbd5e1;
+      --popup-bg: #ffffff;
+      --popup-text: #0f172a;
+      --btn-secondary-bg: #ffffff;
+      --btn-secondary-border: #cbd5e1;
+      --btn-secondary-text: #334155;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .theme-title { color: var(--title-color); }
+    .theme-sub { color: var(--sub-color); }
+
+    .theme-input {
+      background-color: var(--input-bg) !important;
+      border-color: var(--input-border) !important;
+      color: var(--input-text) !important;
+    }
+
+    .theme-btn-secondary {
+      background-color: var(--btn-secondary-bg);
+      border-color: var(--btn-secondary-border);
+      color: var(--btn-secondary-text);
+    }
+
+    .theme-table-head {
+      background-color: var(--table-head-bg);
+      color: var(--sub-color);
+    }
+
+    .theme-table-row:hover {
+      background-color: var(--table-row-hover);
+    }
+
+    .theme-table-border {
+      border-color: var(--table-border);
+    }
+
+    /* Leaflet Customization */
+    .leaflet-popup-content-wrapper {
+      background: var(--popup-bg);
+      color: var(--popup-text);
+      border: 1px solid var(--card-border);
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+    .leaflet-popup-tip {
+      background: var(--popup-bg);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Navigation Bar -->
+  <header class="glass-card sticky top-0 z-40 px-6 py-4 flex items-center justify-between shadow-lg">
+    <div class="flex items-center gap-3">
+      <div class="bg-indigo-600/20 p-2.5 rounded-xl border border-indigo-500/30 text-indigo-500">
+        <i class="fa-solid fa-school text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold tracking-wide theme-title">Dashboard Pemetaan Sekolah</h1>
+        <p class="text-xs theme-sub">Sistem Informasi Pengendalian Penduduk (Dalduk)</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <!-- Theme Switcher Button -->
+      <button id="btnThemeToggle" onclick="toggleTheme()" class="px-3.5 py-2 text-xs font-medium theme-btn-secondary rounded-lg border transition flex items-center gap-2" title="Switch Theme">
+        <i id="themeIcon" class="fa-solid fa-sun text-amber-400"></i>
+        <span id="themeText" class="hidden sm:inline">Light Mode</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Body -->
+  <main class="flex-1 px-6 py-6 max-w-7xl mx-auto w-full space-y-6">
+
+    <!-- 1. KPI Metric Cards Grid (Total Sekolah, SD, SMP, SMA) -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+      <!-- Card 1: Total Sekolah -->
+      <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium theme-sub uppercase tracking-wider">Total Sekolah</p>
+          <h2 id="cardTotal" class="text-3xl font-bold theme-title mt-1">0</h2>
+          <p class="text-xs text-emerald-500 mt-1 flex items-center gap-1">
+            <i class="fa-solid fa-check-circle"></i> Sesuai filter analytics
+          </p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500 text-xl">
+          <i class="fa-solid fa-building-columns"></i>
+        </div>
+      </div>
+
+      <!-- Card 2: SD / Sederajat -->
+      <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium theme-sub uppercase tracking-wider">SD / Sederajat</p>
+          <h2 id="cardSD" class="text-3xl font-bold text-sky-500 mt-1">0</h2>
+          <p class="text-xs theme-sub mt-1">Tingkat Dasar</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-500 text-xl">
+          <i class="fa-solid fa-child"></i>
+        </div>
+      </div>
+
+      <!-- Card 3: SMP / Sederajat -->
+      <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium theme-sub uppercase tracking-wider">SMP / Sederajat</p>
+          <h2 id="cardSMP" class="text-3xl font-bold text-amber-500 mt-1">0</h2>
+          <p class="text-xs theme-sub mt-1">Tingkat Menengah Pertama</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 text-xl">
+          <i class="fa-solid fa-user-graduate"></i>
+        </div>
+      </div>
+
+      <!-- Card 4: SMA / Sederajat -->
+      <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium theme-sub uppercase tracking-wider">SMA / Sederajat</p>
+          <h2 id="cardSMA" class="text-3xl font-bold text-emerald-500 mt-1">0</h2>
+          <p class="text-xs theme-sub mt-1">Tingkat Menengah Atas</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 text-xl">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Panel Filter Interaktif Analytics & Pemetaan (Hanya mengontrol Grafik 1, Grafik 2, dan Peta 3) -->
+    <div class="glass-card p-5 rounded-2xl space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b theme-table-border pb-3">
+        <div>
+          <h2 class="text-sm font-bold theme-title flex items-center gap-2">
+            <i class="fa-solid fa-sliders text-indigo-500"></i>
+            Panel Filter Interaktif (Grafik & Peta)
+          </h2>
+          <p class="text-[11px] theme-sub mt-0.5">Mengontrol data bagian: 1. Proporsi Jenjang, 2. Distribusi Klasifikasi, dan 3. Peta Interaktif</p>
+        </div>
+
+        <button onclick="resetAnalyticsFilters()" class="self-start sm:self-auto text-xs text-rose-400 hover:text-rose-300 transition flex items-center gap-1 font-medium">
+          <i class="fa-solid fa-rotate-left text-[10px]"></i> Reset Filter Analytics
+        </button>
+      </div>
+
+      <!-- Filter Controls Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+        <!-- Filter 1: Cari Nama/Alamat/NPSN -->
+        <div class="text-center">
+          <label class="block theme-sub font-medium text-xs truncate mb-1 text-center" title="Pencarian Kata Kunci">Pencarian Kata Kunci</label>
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 theme-sub text-[11px]"></i>
+            <input type="text" id="analyticsSearch" oninput="onAnalyticsFilterChange()" placeholder="Cari sekolah, alamat..." class="w-full theme-input rounded-lg pl-8 pr-3 h-9 text-xs text-center focus:outline-none focus:border-indigo-500 transition" />
+          </div>
+        </div>
+
+        <!-- Filter 2: Jenjang Sekolah -->
+        <div class="text-center">
+          <label class="block theme-sub font-medium text-xs truncate mb-1 text-center" title="Filter Jenjang Sekolah">Filter Jenjang Sekolah</label>
+          <select id="analyticsJenjang" onchange="onAnalyticsFilterChange()" class="w-full theme-input rounded-lg px-3 h-9 text-xs text-center focus:outline-none focus:border-indigo-500">
+            <option value="">Semua Jenjang (SD, SMP, SMA)</option>
+            <option value="SD / Sederajat">SD / Sederajat</option>
+            <option value="SMP / Sederajat">SMP / Sederajat</option>
+            <option value="SMA / Sederajat">SMA / Sederajat</option>
+          </select>
+        </div>
+
+        <!-- Filter 3: Klasifikasi Sekolah -->
+        <div class="text-center">
+          <label class="block theme-sub font-medium text-xs truncate mb-1 text-center" title="Filter Klasifikasi Sekolah">Filter Klasifikasi Sekolah</label>
+          <select id="analyticsKlasifikasi" onchange="onAnalyticsFilterChange()" class="w-full theme-input rounded-lg px-3 h-9 text-xs text-center focus:outline-none focus:border-indigo-500">
+            <option value="">Semua Klasifikasi Status</option>
+            <option value="Terdaftar">Terdaftar</option>
+            <option value="Dasar">Dasar</option>
+            <option value="Paripurna">Paripurna</option>
+          </select>
+        </div>
+
+        <!-- Filter 4: Wilayah Kabupaten / Kota (Populated dynamically) -->
+        <div class="text-center">
+          <label class="block theme-sub font-medium text-xs truncate mb-1 text-center" title="Filter Wilayah Kabupaten / Kota">Filter Wilayah Kabupaten / Kota</label>
+          <select id="analyticsWilayah" onchange="onAnalyticsFilterChange()" class="w-full theme-input rounded-lg px-3 h-9 text-xs text-center focus:outline-none focus:border-indigo-500">
+            <option value="">Semua Wilayah Kabupaten / Kota</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Active Filters Tag Indicators -->
+      <div id="analyticsFilterTags" class="flex flex-wrap items-center gap-2 pt-1 hidden">
+        <span class="text-[10px] theme-sub uppercase tracking-wider font-semibold">Filter Analytics Aktif:</span>
+        <div id="analyticsTagsList" class="flex flex-wrap gap-1.5"></div>
+      </div>
+    </div>
+
+    <!-- 3. Charts & Analytics Section -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+      <!-- Donut Chart: 1. Proporsi Jenjang Sekolah -->
+      <div class="md:col-span-5 glass-card p-5 rounded-2xl flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-semibold theme-title flex items-center gap-2">
+            <i class="fa-solid fa-chart-pie text-indigo-500"></i>
+            1. Proporsi Jenjang Sekolah
+          </h3>
+        </div>
+        <div class="relative flex items-center justify-center h-64">
+          <canvas id="chartJenjang"></canvas>
+        </div>
+      </div>
+
+      <!-- Bar Chart: 2. Distribusi Klasifikasi Sekolah -->
+      <div class="md:col-span-7 glass-card p-5 rounded-2xl flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-semibold theme-title flex items-center gap-2">
+            <i class="fa-solid fa-chart-column text-emerald-500"></i>
+            2. Distribusi Klasifikasi Sekolah
+          </h3>
+        </div>
+        <div class="relative h-64">
+          <canvas id="chartKlasifikasi"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Interactive Map Section: 3. Peta Pesebaran Sekolah Interaktif -->
+    <div class="glass-card p-5 rounded-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-semibold theme-title flex items-center gap-2">
+            <i class="fa-solid fa-map-location-dot text-rose-500"></i>
+            3. Peta Pesebaran Sekolah Interaktif
+          </h3>
+          <p class="text-xs theme-sub">Penanda titik lokasi sekolah sesuai filter analytics aktif</p>
+        </div>
+        <div class="flex items-center gap-3 text-xs">
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-sky-500"></span> SD</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500"></span> SMP</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> SMA</span>
+        </div>
+      </div>
+
+      <!-- Map Container -->
+      <div id="map" class="w-full h-96 rounded-xl border theme-table-border overflow-hidden shadow-inner"></div>
+    </div>
+
+    <!-- 5. Data Table Section (Filter Terpisah Khusus Tabel & Paginasi) -->
+    <div class="glass-card p-5 rounded-2xl space-y-4">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b theme-table-border pb-4">
+        <div>
+          <h3 class="text-base font-semibold theme-title flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-indigo-500"></i>
+            Daftar Rincian Data Sekolah
+          </h3>
+          <p class="text-xs theme-sub">Filter khusus & paginasi data sekolah</p>
+        </div>
+
+        <!-- Filter Khusus Tabel & Opsi Limit Paginasi -->
+        <div class="flex flex-wrap items-center gap-2.5 text-xs">
+          <!-- Search Input Table -->
+          <div class="relative min-w-[180px]">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 theme-sub text-[11px]"></i>
+            <input type="text" id="tableSearch" oninput="onTableFilterChange()" placeholder="Cari nama/alamat..." class="w-full theme-input rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none focus:border-indigo-500" />
+          </div>
+
+          <!-- Select Jenjang Table -->
+          <select id="tableFilterJenjang" onchange="onTableFilterChange()" class="theme-input rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
+            <option value="">Semua Jenjang</option>
+            <option value="SD / Sederajat">SD / Sederajat</option>
+            <option value="SMP / Sederajat">SMP / Sederajat</option>
+            <option value="SMA / Sederajat">SMA / Sederajat</option>
+          </select>
+
+          <!-- Select Klasifikasi Table -->
+          <select id="tableFilterKlasifikasi" onchange="onTableFilterChange()" class="theme-input rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
+            <option value="">Semua Klasifikasi</option>
+            <option value="Terdaftar">Terdaftar</option>
+            <option value="Dasar">Dasar</option>
+            <option value="Paripurna">Paripurna</option>
+          </select>
+
+          <!-- Select Wilayah Table -->
+          <select id="tableFilterWilayah" onchange="onTableFilterChange()" class="theme-input rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
+            <option value="">Semua Wilayah</option>
+          </select>
+
+          <!-- Limit Per Halaman (10, 50, 100) -->
+          <div class="flex items-center gap-1">
+            <select id="tableLimit" onchange="onTableLimitChange()" class="theme-input rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-indigo-500 font-semibold text-indigo-400" title="Jumlah Baris Per Halaman">
+              <option value="10">10 / hal</option>
+              <option value="50">50 / hal</option>
+              <option value="100">100 / hal</option>
+            </select>
+          </div>
+
+          <!-- Reset Table Filter -->
+          <button onclick="resetTableFilters()" class="px-2.5 py-1.5 rounded-lg theme-btn-secondary text-[11px] font-medium border hover:text-rose-400 transition" title="Reset Filter Tabel">
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Table Container -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="theme-table-head uppercase font-medium border-b theme-table-border">
+            <tr>
+              <th class="py-3 px-4">NPSN</th>
+              <th class="py-3 px-4">Nama Sekolah & Alamat</th>
+              <th class="py-3 px-4">Jenjang</th>
+              <th class="py-3 px-4">Klasifikasi</th>
+              <th class="py-3 px-4">Wilayah</th>
+              <th class="py-3 px-4 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y theme-table-border">
+            <tr>
+              <td colspan="6" class="py-8 text-center theme-sub">Memuat data sekolah...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Pagination Footer Control -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t theme-table-border text-xs">
+        <div id="tablePaginationInfo" class="theme-sub text-xs">
+          Menampilkan <span id="pageStart" class="font-semibold theme-title">0</span> - <span id="pageEnd" class="font-semibold theme-title">0</span> dari <span id="pageTotalItems" class="font-semibold theme-title">0</span> data sekolah
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="btnPrevPage" onclick="changeTablePage(currentTablePage - 1)" class="px-3 py-1.5 rounded-lg theme-btn-secondary border transition flex items-center gap-1 font-medium disabled:opacity-40 disabled:cursor-not-allowed">
+            <i class="fa-solid fa-chevron-left text-[10px]"></i> Prev
+          </button>
+
+          <div id="pageNumbersContainer" class="flex items-center gap-1"></div>
+
+          <button id="btnNextPage" onclick="changeTablePage(currentTablePage + 1)" class="px-3 py-1.5 rounded-lg theme-btn-secondary border transition flex items-center gap-1 font-medium disabled:opacity-40 disabled:cursor-not-allowed">
+            Next <i class="fa-solid fa-chevron-right text-[10px]"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- JavaScript Logic -->
+  <script>
+    let map;
+    let tileLayer;
+    let markersLayer = L.layerGroup();
+    let chartJenjangInst;
+    let chartKlasifikasiInst;
+    let searchAnalyticsDebounce;
+    let searchTableDebounce;
+    let currentTheme = localStorage.getItem('theme') || 'dark';
+
+    let currentTablePage = 1;
+    let totalTablePages = 1;
+
+    // 1. Active Filters State for Analytics (Metric Cards, Donut Chart 1, Bar Chart 2, Map 3)
+    const analyticsFilters = {
+      search: '',
+      jenjang: '',
+      klasifikasi: '',
+      wilayah: ''
+    };
+
+    // 2. Active Filters State for Data Table (Daftar Rincian Data Sekolah)
+    const tableFilters = {
+      search: '',
+      jenjang: '',
+      klasifikasi: '',
+      wilayah: '',
+      page: 1,
+      limit: 10
+    };
+
+    const darkTileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+    const lightTileUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+    // Init App
+    document.addEventListener('DOMContentLoaded', () => {
+      initMap();
+      initCharts();
+      applyTheme(currentTheme);
+      fetchAnalyticsData();
+      fetchTableData();
+    });
+
+    // Theme Switcher Logic
+    function applyTheme(theme) {
+      currentTheme = theme;
+      localStorage.setItem('theme', theme);
+
+      const htmlEl = document.documentElement;
+      const iconEl = document.getElementById('themeIcon');
+      const textEl = document.getElementById('themeText');
+
+      if (theme === 'light') {
+        htmlEl.classList.add('light');
+        if (iconEl) iconEl.className = 'fa-solid fa-moon text-indigo-600';
+        if (textEl) textEl.innerText = 'Dark Mode';
+      } else {
+        htmlEl.classList.remove('light');
+        if (iconEl) iconEl.className = 'fa-solid fa-sun text-amber-400';
+        if (textEl) textEl.innerText = 'Light Mode';
+      }
+
+      // Swap Leaflet Tile Layer
+      if (map) {
+        if (tileLayer) map.removeLayer(tileLayer);
+        const tileUrl = theme === 'light' ? lightTileUrl : darkTileUrl;
+        tileLayer = L.tileLayer(tileUrl, {
+          attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+          subdomains: 'abcd',
+          maxZoom: 19
+        }).addTo(map);
+      }
+
+      // Update Chart Colors
+      updateChartColors(theme);
+    }
+
+    function toggleTheme() {
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(newTheme);
+    }
+
+    function updateChartColors(theme) {
+      const textColor = theme === 'light' ? '#475569' : '#94a3b8';
+      const gridColor = theme === 'light' ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.05)';
+
+      if (chartJenjangInst) {
+        chartJenjangInst.options.plugins.legend.labels.color = textColor;
+        chartJenjangInst.update();
+      }
+      if (chartKlasifikasiInst) {
+        chartKlasifikasiInst.options.scales.x.ticks.color = textColor;
+        chartKlasifikasiInst.options.scales.y.ticks.color = textColor;
+        chartKlasifikasiInst.options.scales.y.grid.color = gridColor;
+        chartKlasifikasiInst.update();
+      }
+    }
+
+    // --- Analytics Filter Handlers (Cards, Charts 1 & 2, Map 3) ---
+    function onAnalyticsFilterChange() {
+      clearTimeout(searchAnalyticsDebounce);
+      searchAnalyticsDebounce = setTimeout(() => {
+        analyticsFilters.search = document.getElementById('analyticsSearch').value.trim();
+        analyticsFilters.jenjang = document.getElementById('analyticsJenjang').value;
+        analyticsFilters.klasifikasi = document.getElementById('analyticsKlasifikasi').value;
+        analyticsFilters.wilayah = document.getElementById('analyticsWilayah').value;
+
+        updateAnalyticsFilterTags();
+        fetchAnalyticsData();
+      }, 250);
+    }
+
+    function resetAnalyticsFilters() {
+      document.getElementById('analyticsSearch').value = '';
+      document.getElementById('analyticsJenjang').value = '';
+      document.getElementById('analyticsKlasifikasi').value = '';
+      document.getElementById('analyticsWilayah').value = '';
+
+      analyticsFilters.search = '';
+      analyticsFilters.jenjang = '';
+      analyticsFilters.klasifikasi = '';
+      analyticsFilters.wilayah = '';
+
+      updateAnalyticsFilterTags();
+      fetchAnalyticsData();
+    }
+
+    function updateAnalyticsFilterTags() {
+      const container = document.getElementById('analyticsFilterTags');
+      const list = document.getElementById('analyticsTagsList');
+      list.innerHTML = '';
+
+      const activeKeys = Object.keys(analyticsFilters).filter(k => analyticsFilters[k]);
+
+      if (activeKeys.length === 0) {
+        container.classList.add('hidden');
+        return;
+      }
+
+      container.classList.remove('hidden');
+
+      activeKeys.forEach(key => {
+        const val = analyticsFilters[key];
+        const tag = document.createElement('span');
+        tag.className = 'px-2 py-0.5 rounded-md text-[10px] font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center gap-1';
+        tag.innerHTML = `
+          <span>${capitalize(key)}: <strong>${escapeHtml(val)}</strong></span>
+          <button onclick="removeAnalyticsFilterKey('${key}')" class="hover:text-rose-400 ml-1"><i class="fa-solid fa-xmark text-[9px]"></i></button>
+        `;
+        list.appendChild(tag);
+      });
+    }
+
+    function removeAnalyticsFilterKey(key) {
+      if (key === 'search') document.getElementById('analyticsSearch').value = '';
+      if (key === 'jenjang') document.getElementById('analyticsJenjang').value = '';
+      if (key === 'klasifikasi') document.getElementById('analyticsKlasifikasi').value = '';
+      if (key === 'wilayah') document.getElementById('analyticsWilayah').value = '';
+
+      analyticsFilters[key] = '';
+      updateAnalyticsFilterTags();
+      fetchAnalyticsData();
+    }
+
+    // --- Table Filter & Pagination Handlers (Daftar Rincian Data Sekolah) ---
+    function onTableFilterChange() {
+      clearTimeout(searchTableDebounce);
+      searchTableDebounce = setTimeout(() => {
+        tableFilters.search = document.getElementById('tableSearch').value.trim();
+        tableFilters.jenjang = document.getElementById('tableFilterJenjang').value;
+        tableFilters.klasifikasi = document.getElementById('tableFilterKlasifikasi').value;
+        tableFilters.wilayah = document.getElementById('tableFilterWilayah').value;
+        tableFilters.page = 1;
+
+        fetchTableData();
+      }, 250);
+    }
+
+    function onTableLimitChange() {
+      tableFilters.limit = parseInt(document.getElementById('tableLimit').value, 10) || 10;
+      tableFilters.page = 1;
+      fetchTableData();
+    }
+
+    function changeTablePage(newPage) {
+      if (newPage < 1 || newPage > totalTablePages) return;
+      tableFilters.page = newPage;
+      fetchTableData();
+    }
+
+    function resetTableFilters() {
+      document.getElementById('tableSearch').value = '';
+      document.getElementById('tableFilterJenjang').value = '';
+      document.getElementById('tableFilterKlasifikasi').value = '';
+      document.getElementById('tableFilterWilayah').value = '';
+      document.getElementById('tableLimit').value = '10';
+
+      tableFilters.search = '';
+      tableFilters.jenjang = '';
+      tableFilters.klasifikasi = '';
+      tableFilters.wilayah = '';
+      tableFilters.page = 1;
+      tableFilters.limit = 10;
+
+      fetchTableData();
+    }
+
+    // Initialize Leaflet Map (Default Center: Provinsi Banten)
+    function initMap() {
+      map = L.map('map').setView([-6.4058, 106.0640], 9.5);
+      const tileUrl = currentTheme === 'light' ? lightTileUrl : darkTileUrl;
+      tileLayer = L.tileLayer(tileUrl, {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(map);
+
+      markersLayer.addTo(map);
+    }
+
+    // Initialize Chart.js
+    function initCharts() {
+      const textColor = currentTheme === 'light' ? '#475569' : '#94a3b8';
+      const gridColor = currentTheme === 'light' ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.05)';
+
+      // Donut Chart: 1. Proporsi Jenjang Sekolah
+      const ctxJenjang = document.getElementById('chartJenjang').getContext('2d');
+      chartJenjangInst = new Chart(ctxJenjang, {
+        type: 'doughnut',
+        data: {
+          labels: ['SD / Sederajat', 'SMP / Sederajat', 'SMA / Sederajat'],
+          datasets: [{
+            data: [0, 0, 0],
+            backgroundColor: ['#38bdf8', '#fbbf24', '#34d399'],
+            borderColor: currentTheme === 'light' ? '#ffffff' : '#1e293b',
+            borderWidth: 3,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: textColor, font: { family: 'Inter', size: 11 } }
+            }
+          }
+        }
+      });
+
+      // Bar Chart: 2. Distribusi Klasifikasi Sekolah
+      const ctxKlasifikasi = document.getElementById('chartKlasifikasi').getContext('2d');
+      chartKlasifikasiInst = new Chart(ctxKlasifikasi, {
+        type: 'bar',
+        data: {
+          labels: ['Terdaftar', 'Dasar', 'Paripurna'],
+          datasets: [{
+            label: 'Jumlah Sekolah',
+            data: [0, 0, 0],
+            backgroundColor: ['#818cf8', '#a78bfa', '#f472b6'],
+            borderRadius: 6,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: textColor }, grid: { display: false } },
+            y: { ticks: { color: textColor, stepSize: 1 }, grid: { color: gridColor } }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    // Build URL SearchParams
+    function buildParamsObj(filtersObj) {
+      const params = new URLSearchParams();
+      if (filtersObj.search) params.append('search', filtersObj.search);
+      if (filtersObj.jenjang) params.append('jenjang', filtersObj.jenjang);
+      if (filtersObj.klasifikasi) params.append('klasifikasi', filtersObj.klasifikasi);
+      if (filtersObj.wilayah) params.append('wilayah', filtersObj.wilayah);
+      return params.toString();
+    }
+
+    // Fetch Analytics Data (Metric Cards, Donut Chart 1, Bar Chart 2, Leaflet Map 3)
+    async function fetchAnalyticsData() {
+      try {
+        const queryStr = buildParamsObj(analyticsFilters);
+        const [statsRes, listRes] = await Promise.all([
+          fetch(`/api/sekolah/stats?${queryStr}`),
+          fetch(`/api/sekolah?${queryStr}&limit=99999`)
+        ]);
+
+        const statsJson = await statsRes.json();
+        const listJson = await listRes.json();
+
+        if (statsJson.success && statsJson.data) {
+          const { total, perJenjang, perKlasifikasi, availableWilayah } = statsJson.data;
+
+          populateWilayahDropdowns(availableWilayah);
+
+          document.getElementById('cardTotal').innerText = total;
+          document.getElementById('cardSD').innerText = perJenjang['SD / Sederajat'] || 0;
+          document.getElementById('cardSMP').innerText = perJenjang['SMP / Sederajat'] || 0;
+          document.getElementById('cardSMA').innerText = perJenjang['SMA / Sederajat'] || 0;
+
+          // Update Donut Chart: 1. Proporsi Jenjang Sekolah
+          chartJenjangInst.data.datasets[0].data = [
+            perJenjang['SD / Sederajat'] || 0,
+            perJenjang['SMP / Sederajat'] || 0,
+            perJenjang['SMA / Sederajat'] || 0,
+          ];
+          chartJenjangInst.update();
+
+          // Update Bar Chart: 2. Distribusi Klasifikasi Sekolah
+          chartKlasifikasiInst.data.datasets[0].data = [
+            perKlasifikasi['Terdaftar'] || 0,
+            perKlasifikasi['Dasar'] || 0,
+            perKlasifikasi['Paripurna'] || 0,
+          ];
+          chartKlasifikasiInst.update();
+        }
+
+        if (listJson.success) {
+          renderMapMarkers(listJson.data);
+        }
+      } catch (err) {
+        console.error('Error fetching analytics data:', err);
+      }
+    }
+
+    // Fetch Table Data (Daftar Rincian Data Sekolah) independently with Pagination
+    async function fetchTableData() {
+      try {
+        const queryStr = buildParamsObj(tableFilters);
+        const res = await fetch(`/api/sekolah?${queryStr}&page=${tableFilters.page}&limit=${tableFilters.limit}`);
+        const json = await res.json();
+        if (json.success) {
+          renderTable(json.data);
+          if (json.pagination) {
+            renderTablePagination(json.pagination);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching table data:', err);
+      }
+    }
+
+    // Render Table Pagination Footer Controls
+    function renderTablePagination(pagination) {
+      const { page, limit, totalItems, totalPages } = pagination;
+      currentTablePage = page;
+      totalTablePages = totalPages;
+
+      const start = totalItems === 0 ? 0 : (page - 1) * limit + 1;
+      const end = Math.min(page * limit, totalItems);
+
+      document.getElementById('pageStart').innerText = start;
+      document.getElementById('pageEnd').innerText = end;
+      document.getElementById('pageTotalItems').innerText = totalItems;
+
+      const btnPrev = document.getElementById('btnPrevPage');
+      const btnNext = document.getElementById('btnNextPage');
+      if (btnPrev) btnPrev.disabled = page <= 1;
+      if (btnNext) btnNext.disabled = page >= totalPages;
+
+      const pageContainer = document.getElementById('pageNumbersContainer');
+      if (pageContainer) {
+        pageContainer.innerHTML = '';
+        for (let i = 1; i <= totalPages; i++) {
+          if (totalPages > 7 && Math.abs(i - page) > 2 && i !== 1 && i !== totalPages) {
+            if (i === 2 || i === totalPages - 1) {
+              const dots = document.createElement('span');
+              dots.className = 'px-1 theme-sub text-xs';
+              dots.innerText = '...';
+              pageContainer.appendChild(dots);
+            }
+            continue;
+          }
+
+          const btn = document.createElement('button');
+          btn.onclick = () => changeTablePage(i);
+          btn.className = i === page
+            ? 'w-7 h-7 rounded-lg bg-indigo-600 text-white font-semibold text-xs transition shadow-md shadow-indigo-600/30'
+            : 'w-7 h-7 rounded-lg theme-btn-secondary border theme-sub hover:text-indigo-400 font-medium text-xs transition';
+          btn.innerText = i;
+          pageContainer.appendChild(btn);
+        }
+      }
+    }
+
+    // Populate Dynamic Wilayah Dropdowns for both analytics & table filter selects
+    function populateWilayahDropdowns(wilayahList) {
+      if (!wilayahList) return;
+
+      ['analyticsWilayah', 'tableFilterWilayah'].forEach(id => {
+        const select = document.getElementById(id);
+        if (!select || select.options.length > 1) return;
+
+        const selectedVal = select.value;
+        select.innerHTML = '<option value="">Semua Wilayah Kabupaten / Kota</option>';
+
+        wilayahList.forEach(w => {
+          const opt = document.createElement('option');
+          opt.value = w;
+          opt.innerText = w;
+          select.appendChild(opt);
+        });
+
+        select.value = selectedVal;
+      });
+    }
+
+    // Render Table
+    function renderTable(data) {
+      const tbody = document.getElementById('tableBody');
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-8 text-center theme-sub">
+              Tidak ada data sekolah yang sesuai dengan filter tabel aktif.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = data.map(item => `
+        <tr class="theme-table-row transition">
+          <td class="py-3 px-4 font-mono theme-sub">#${item.npsn}</td>
+          <td class="py-3 px-4">
+            <div class="font-medium theme-title">${escapeHtml(item.namaSekolah)}</div>
+            ${item.alamat ? `<div class="text-[11px] theme-sub font-normal mt-0.5"><i class="fa-solid fa-location-dot text-indigo-400 mr-1 text-[10px]"></i>${escapeHtml(item.alamat)}</div>` : ''}
+          </td>
+          <td class="py-3 px-4">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold ${getJenjangBadgeClass(item.jenjang)}">
+              ${item.jenjang}
+            </span>
+          </td>
+          <td class="py-3 px-4">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold ${getKlasifikasiBadgeClass(item.klasifikasi)}">
+              ${item.klasifikasi}
+            </span>
+          </td>
+          <td class="py-3 px-4 theme-title">${escapeHtml(item.wilayah)}</td>
+          <td class="py-3 px-4 text-center">
+            <button onclick="deleteSekolah(${item.npsn})" class="text-rose-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-500/10 transition" title="Hapus Data">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Render Map Markers: 3. Peta Pesebaran Sekolah Interaktif
+    function renderMapMarkers(data) {
+      markersLayer.clearLayers();
+      const bounds = [];
+
+      data.forEach(item => {
+        const coords = getWilayahCoordsFallback(item.alamat || item.wilayah);
+        const lat = coords[0];
+        const lng = coords[1];
+
+        if (!isNaN(lat) && !isNaN(lng)) {
+          const color = item.jenjang === 'SD / Sederajat' ? '#38bdf8' : (item.jenjang === 'SMP / Sederajat' ? '#fbbf24' : '#34d399');
+
+          const circleMarker = L.circleMarker([lat, lng], {
+            radius: 8,
+            fillColor: color,
+            color: '#ffffff',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.85
+          });
+
+          const popupContent = `
+            <div class="space-y-1 text-xs">
+              <div class="font-bold text-sm text-indigo-500">${escapeHtml(item.namaSekolah)}</div>
+              <div class="theme-sub font-mono">NPSN: #${item.npsn}</div>
+              <div class="flex gap-1.5 my-1">
+                <span class="px-2 py-0.5 rounded text-[10px] theme-btn-secondary border">${item.jenjang}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] theme-btn-secondary border">${item.klasifikasi}</span>
+              </div>
+              <div class="theme-title"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i>${escapeHtml(item.wilayah)}</div>
+              ${item.alamat ? `<div class="theme-sub text-[11px] mt-1">${escapeHtml(item.alamat)}</div>` : ''}
+            </div>
+          `;
+
+          circleMarker.bindPopup(popupContent);
+          markersLayer.addLayer(circleMarker);
+          bounds.push([lat, lng]);
+        }
+      });
+
+      if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
+      }
+    }
+
+    // Fallback coordinates for Banten Province Regencies & Cities
+    function getWilayahCoordsFallback(text) {
+      const lower = text.toLowerCase();
+
+      // Banten Regencies & Cities
+      if (lower.includes('kota serang') || lower.includes('serang')) return [-6.1200, 106.1500];
+      if (lower.includes('cilegon')) return [-6.0174, 106.0538];
+      if (lower.includes('tangerang selatan') || lower.includes('tangsel')) return [-6.2886, 106.7179];
+      if (lower.includes('kota tangerang')) return [-6.1783, 106.6319];
+      if (lower.includes('kabupaten tangerang') || lower.includes('balaraja') || lower.includes('tigaraksa')) return [-6.2339, 106.4674];
+      if (lower.includes('kabupaten serang') || lower.includes('ciruas')) return [-6.1667, 106.0000];
+      if (lower.includes('pandeglang')) return [-6.3084, 105.9791];
+      if (lower.includes('lebak') || lower.includes('rangkasbitung')) return [-6.5593, 106.2505];
+
+      // Default Banten Center Random Scatter
+      return [-6.4058 + (Math.random() - 0.5) * 0.3, 106.0640 + (Math.random() - 0.5) * 0.4];
+    }
+
+    // Handle Modal Add Sekolah Form Submit
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const payload = {
+        namaSekolah: document.getElementById('namaSekolah').value,
+        jenjang: document.getElementById('jenjang').value,
+        klasifikasi: document.getElementById('klasifikasi').value,
+        wilayah: document.getElementById('wilayah').value,
+        alamat: document.getElementById('alamat').value || null,
+      };
+
+      try {
+        const res = await fetch('/api/sekolah', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+          closeModal();
+          document.getElementById('formSekolah').reset();
+          fetchAnalyticsData();
+          fetchTableData();
+        } else {
+          alert('Gagal menyimpan: ' + (json.error || 'Unknown error'));
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan jaringan.');
+      }
+    }
+
+    // Delete Sekolah
+    async function deleteSekolah(npsn) {
+      if (!confirm(`Apakah Anda yakin ingin menghapus data sekolah dengan NPSN #${npsn}?`)) return;
+
+      try {
+        const res = await fetch(`/api/sekolah/${npsn}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          fetchAnalyticsData();
+          fetchTableData();
+        } else {
+          alert('Gagal menghapus data.');
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan jaringan.');
+      }
+    }
+
+    // Seed Sample Data
+    async function seedSampleData() {
+      try {
+        const res = await fetch('/api/sekolah/seed', { method: 'POST' });
+        const json = await res.json();
+        if (json.success) {
+          alert(json.message);
+          fetchAnalyticsData();
+          fetchTableData();
+        } else {
+          alert('Gagal seed data: ' + json.error);
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan saat memproses seed.');
+      }
+    }
+
+    // Modal Helpers
+    function openModal() {
+      document.getElementById('modalSekolah').classList.remove('hidden');
+      document.getElementById('modalSekolah').classList.add('flex');
+    }
+    function closeModal() {
+      document.getElementById('modalSekolah').classList.add('hidden');
+      document.getElementById('modalSekolah').classList.remove('flex');
+    }
+
+    // Styling Helpers
+    function getJenjangBadgeClass(j) {
+      if (j === 'SD / Sederajat') return 'bg-sky-500/10 text-sky-500 border border-sky-500/20';
+      if (j === 'SMP / Sederajat') return 'bg-amber-500/10 text-amber-500 border border-amber-500/20';
+      return 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20';
+    }
+
+    function getKlasifikasiBadgeClass(k) {
+      if (k === 'Terdaftar') return 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/20';
+      if (k === 'Dasar') return 'bg-purple-500/10 text-purple-500 border border-purple-500/20';
+      return 'bg-rose-500/10 text-rose-500 border border-rose-500/20';
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+  </script>
+</body>
+</html>
