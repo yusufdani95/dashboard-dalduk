@@ -29,7 +29,7 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
               item.namaSekolah.toLowerCase().includes(s) ||
               item.wilayah.toLowerCase().includes(s) ||
               (item.alamat && item.alamat.toLowerCase().includes(s)) ||
-              String(item.npsn).includes(s)
+              String(item.no).includes(s)
           );
         }
 
@@ -121,7 +121,7 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
               item.namaSekolah.toLowerCase().includes(s) ||
               item.wilayah.toLowerCase().includes(s) ||
               (item.alamat && item.alamat.toLowerCase().includes(s)) ||
-              String(item.npsn).includes(s)
+              String(item.no).includes(s)
           );
         }
 
@@ -227,7 +227,7 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
         return {
           success: true,
           message: 'Data sekolah berhasil ditambahkan',
-          data: { npsn: inserted.npsn },
+          data: { no: inserted.no },
         };
       } catch (error: any) {
         set.status = 500;
@@ -260,9 +260,9 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
     }
   )
 
-  // PUT /api/sekolah/:npsn - Update a sekolah (Admin & Operator Sekolah)
+  // PUT /api/sekolah/:no - Update a sekolah (Admin & Operator Sekolah)
   .put(
-    '/:npsn',
+    '/:no',
     async ({ params, body, jwt, cookie: { auth_token }, headers, set }) => {
       const auth = await authenticateAndAuthorize(jwt, auth_token, headers, ['admin', 'operator_sekolah']);
       if (!auth.authorized) {
@@ -271,7 +271,7 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
       }
 
       try {
-        const npsn = Number(params.npsn);
+        const no = Number(params.no);
         await db
           .update(dataSekolah)
           .set({
@@ -281,7 +281,7 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
             wilayah: body.wilayah,
             alamat: body.alamat || null,
           })
-          .where(eq(dataSekolah.npsn, npsn));
+          .where(eq(dataSekolah.no, no));
 
         return {
           success: true,
@@ -296,7 +296,7 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
       }
     },
     {
-      params: t.Object({ npsn: t.Numeric() }),
+      params: t.Object({ no: t.Numeric() }),
       body: t.Object({
         namaSekolah: t.String({ minLength: 1, maxLength: 150 }),
         jenjang: t.Union([
@@ -314,14 +314,14 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
       }),
       detail: {
         tags: ['Sekolah'],
-        summary: 'Update a sekolah record by NPSN (Admin & Operator Sekolah)',
+        summary: 'Update a sekolah record by NO (Admin & Operator Sekolah)',
       },
     }
   )
 
-  // DELETE /api/sekolah/:npsn - Delete a sekolah (Admin & Operator Sekolah)
+  // DELETE /api/sekolah/:no - Delete a sekolah (Admin & Operator Sekolah)
   .delete(
-    '/:npsn',
+    '/:no',
     async ({ params, jwt, cookie: { auth_token }, headers, set }) => {
       const auth = await authenticateAndAuthorize(jwt, auth_token, headers, ['admin', 'operator_sekolah']);
       if (!auth.authorized) {
@@ -330,11 +330,11 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
       }
 
       try {
-        const npsn = Number(params.npsn);
-        await db.delete(dataSekolah).where(eq(dataSekolah.npsn, npsn));
+        const no = Number(params.no);
+        await db.delete(dataSekolah).where(eq(dataSekolah.no, no));
         return {
           success: true,
-          message: `Data sekolah dengan NPSN ${npsn} berhasil dihapus`,
+          message: `Data sekolah dengan NO ${no} berhasil dihapus`,
         };
       } catch (error: any) {
         set.status = 500;
@@ -346,11 +346,11 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
     },
     {
       params: t.Object({
-        npsn: t.Numeric(),
+        no: t.Numeric(),
       }),
       detail: {
         tags: ['Sekolah'],
-        summary: 'Delete a sekolah record by NPSN (Admin & Operator Sekolah)',
+        summary: 'Delete a sekolah record by NO (Admin & Operator Sekolah)',
       },
     }
   )
@@ -366,17 +366,17 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
       }
 
       try {
-        const npsns = body.npsns;
-        if (!npsns || npsns.length === 0) {
+        const nos = body.nos || body.npsns;
+        if (!nos || nos.length === 0) {
           set.status = 400;
           return { success: false, error: 'Tidak ada data sekolah yang dipilih' };
         }
 
-        await db.delete(dataSekolah).where(inArray(dataSekolah.npsn, npsns));
+        await db.delete(dataSekolah).where(inArray(dataSekolah.no, nos));
 
         return {
           success: true,
-          message: `${npsns.length} data sekolah berhasil dihapus`,
+          message: `${nos.length} data sekolah berhasil dihapus`,
         };
       } catch (error: any) {
         set.status = 500;
@@ -388,11 +388,12 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
     },
     {
       body: t.Object({
-        npsns: t.Array(t.Numeric()),
+        nos: t.Optional(t.Array(t.Numeric())),
+        npsns: t.Optional(t.Array(t.Numeric())),
       }),
       detail: {
         tags: ['Sekolah'],
-        summary: 'Batch delete sekolah records by list of NPSNs',
+        summary: 'Batch delete sekolah records by list of NOs',
       },
     }
   );

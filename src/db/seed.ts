@@ -46,7 +46,7 @@ export async function seedDatabase() {
 
     await poolConnection.query(`
       CREATE TABLE IF NOT EXISTS \`data_sekolah\` (
-        \`npsn\` INT AUTO_INCREMENT PRIMARY KEY,
+        \`no\` INT AUTO_INCREMENT PRIMARY KEY,
         \`nama_sekolah\` VARCHAR(150) NOT NULL,
         \`jenjang\` ENUM('SD / Sederajat', 'SMP / Sederajat', 'SMA / Sederajat') NOT NULL,
         \`klasifikasi\` ENUM('Terdaftar', 'Dasar', 'Paripurna') NOT NULL,
@@ -56,6 +56,28 @@ export async function seedDatabase() {
         \`updated_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
+
+    // Check if column 'no' exists, if not recreate or rename npsn -> no
+    try {
+      const [cols]: any = await poolConnection.query(`SHOW COLUMNS FROM \`data_sekolah\` LIKE 'no'`);
+      if (cols.length === 0) {
+        await poolConnection.query(`DROP TABLE IF EXISTS \`data_sekolah\``);
+        await poolConnection.query(`
+          CREATE TABLE \`data_sekolah\` (
+            \`no\` INT AUTO_INCREMENT PRIMARY KEY,
+            \`nama_sekolah\` VARCHAR(150) NOT NULL,
+            \`jenjang\` ENUM('SD / Sederajat', 'SMP / Sederajat', 'SMA / Sederajat') NOT NULL,
+            \`klasifikasi\` ENUM('Terdaftar', 'Dasar', 'Paripurna') NOT NULL,
+            \`wilayah\` VARCHAR(255) NOT NULL,
+            \`alamat\` VARCHAR(255),
+            \`created_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            \`updated_at\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        `);
+      }
+    } catch (e) {
+      console.log('Warning checking data_sekolah table:', e);
+    }
 
     // Seed default admin if no admin exists
     const existingAdmin = await db.select().from(users).where(eq(users.username, 'admin'));

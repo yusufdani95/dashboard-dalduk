@@ -236,7 +236,7 @@
 
       <!-- Filter Controls Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-        <!-- Filter 1: Cari Nama/Alamat/NPSN -->
+        <!-- Filter 1: Cari Nama/Alamat/NO -->
         <div class="text-center">
           <label class="block theme-sub font-medium text-xs truncate mb-1 text-center" title="Pencarian Kata Kunci">Pencarian Kata Kunci</label>
           <div class="relative">
@@ -394,7 +394,7 @@
         <table class="w-full text-left text-xs border-collapse">
           <thead class="theme-table-head uppercase font-medium border-b theme-table-border">
             <tr>
-              <th class="py-3 px-4">NPSN</th>
+              <th class="py-3 px-4">NO</th>
               <th class="py-3 px-4">Nama Sekolah & Alamat</th>
               <th class="py-3 px-4">Jenjang</th>
               <th class="py-3 px-4">Klasifikasi</th>
@@ -866,7 +866,7 @@
 
       tbody.innerHTML = data.map(item => `
         <tr class="theme-table-row transition">
-          <td class="py-3 px-4 font-mono theme-sub">#${item.npsn}</td>
+          <td class="py-3 px-4 font-mono theme-sub">#${item.no}</td>
           <td class="py-3 px-4">
             <div class="font-medium theme-title">${escapeHtml(item.namaSekolah)}</div>
             ${item.alamat ? `<div class="text-[11px] theme-sub font-normal mt-0.5"><i class="fa-solid fa-location-dot text-indigo-400 mr-1 text-[10px]"></i>${escapeHtml(item.alamat)}</div>` : ''}
@@ -883,7 +883,7 @@
           </td>
           <td class="py-3 px-4 theme-title">${escapeHtml(item.wilayah)}</td>
           <td class="py-3 px-4 text-center">
-            <button onclick="deleteSekolah(${item.npsn})" class="text-rose-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-500/10 transition" title="Hapus Data">
+            <button onclick="deleteSekolah(${item.no})" class="text-rose-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-500/10 transition" title="Hapus Data">
               <i class="fa-solid fa-trash-can"></i>
             </button>
           </td>
@@ -916,7 +916,7 @@
           const popupContent = `
             <div class="space-y-1 text-xs">
               <div class="font-bold text-sm text-indigo-500">${escapeHtml(item.namaSekolah)}</div>
-              <div class="theme-sub font-mono">NPSN: #${item.npsn}</div>
+              <div class="theme-sub font-mono">NO: #${item.no}</div>
               <div class="flex gap-1.5 my-1">
                 <span class="px-2 py-0.5 rounded text-[10px] theme-btn-secondary border">${item.jenjang}</span>
                 <span class="px-2 py-0.5 rounded text-[10px] theme-btn-secondary border">${item.klasifikasi}</span>
@@ -988,11 +988,11 @@
     }
 
     // Delete Sekolah
-    async function deleteSekolah(npsn) {
-      if (!confirm(`Apakah Anda yakin ingin menghapus data sekolah dengan NPSN #${npsn}?`)) return;
+    async function deleteSekolah(no) {
+      if (!confirm(`Apakah Anda yakin ingin menghapus data sekolah dengan NO #${no}?`)) return;
 
       try {
-        const res = await fetch(`/api/sekolah/${npsn}`, { method: 'DELETE' });
+        const res = await fetch(`/api/sekolah/${no}`, { method: 'DELETE' });
         const json = await res.json();
         if (json.success) {
           fetchAnalyticsData();

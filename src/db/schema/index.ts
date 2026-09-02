@@ -30,7 +30,7 @@ export const klasifikasiEnum = mysqlEnum('klasifikasi', [
 ]);
 
 export const dataSekolah = mysqlTable('data_sekolah', {
-  npsn: int('npsn').primaryKey().autoincrement(),
+  no: int('no').primaryKey().autoincrement(),
   namaSekolah: varchar('nama_sekolah', { length: 150 }).notNull(),
   jenjang: jenjangEnum.notNull(),
   klasifikasi: klasifikasiEnum.notNull(),
