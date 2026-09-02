@@ -261,8 +261,18 @@
           </div>
 
           <!-- Pagination Footer -->
-          <div class="px-5 py-3.5 glass-panel border-t flex items-center justify-between text-xs theme-muted">
-            <span id="sekolahPaginationInfo">Menampilkan 0 dari 0 data</span>
+          <div class="px-5 py-3.5 glass-panel border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-xs theme-muted">
+            <div class="flex items-center gap-4">
+              <span id="sekolahPaginationInfo">Menampilkan 0 dari 0 data</span>
+              <div class="flex items-center gap-1.5">
+                <label for="sekolahLimitSelect">Tampilkan per halaman:</label>
+                <select id="sekolahLimitSelect" class="theme-input border rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-indigo-500">
+                  <option value="10" selected>10</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+            </div>
             <div class="flex items-center gap-2" id="sekolahPaginationBtns">
             </div>
           </div>
@@ -322,8 +332,18 @@
           </div>
 
           <!-- Pagination Footer -->
-          <div class="px-5 py-3.5 glass-panel border-t flex items-center justify-between text-xs theme-muted">
-            <span id="usersPaginationInfo">Menampilkan 0 dari 0 pengguna</span>
+          <div class="px-5 py-3.5 glass-panel border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-xs theme-muted">
+            <div class="flex items-center gap-4">
+              <span id="usersPaginationInfo">Menampilkan 0 dari 0 pengguna</span>
+              <div class="flex items-center gap-1.5">
+                <label for="usersLimitSelect">Tampilkan per halaman:</label>
+                <select id="usersLimitSelect" class="theme-input border rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-indigo-500">
+                  <option value="10" selected>10</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+            </div>
             <div class="flex items-center gap-2" id="usersPaginationBtns">
             </div>
           </div>
@@ -937,14 +957,22 @@
       }
     });
 
-    // Event Listeners for Filters & Search
+    // Event Listeners for Filters & Search & Pagination Limits
     document.getElementById('searchSekolahInput').addEventListener('input', () => loadSekolahData(1));
     document.getElementById('filterJenjangSelect').addEventListener('change', () => loadSekolahData(1));
     document.getElementById('filterKlasifikasiSelect').addEventListener('change', () => loadSekolahData(1));
     document.getElementById('filterWilayahSelect').addEventListener('change', () => loadSekolahData(1));
+    document.getElementById('sekolahLimitSelect').addEventListener('change', (e) => {
+      sekolahState.limit = parseInt(e.target.value, 10);
+      loadSekolahData(1);
+    });
 
     document.getElementById('searchUserInput').addEventListener('input', () => loadUsersData(1));
     document.getElementById('filterRoleSelect').addEventListener('change', () => loadUsersData(1));
+    document.getElementById('usersLimitSelect').addEventListener('change', (e) => {
+      usersState.limit = parseInt(e.target.value, 10);
+      loadUsersData(1);
+    });
 
     // Initialize on Load
     window.addEventListener('DOMContentLoaded', async () => {
