@@ -159,6 +159,12 @@
         <i id="themeIcon" class="fa-solid fa-sun text-amber-400"></i>
         <span id="themeText" class="hidden sm:inline">Light Mode</span>
       </button>
+
+      <!-- Admin Access / Login Button -->
+      <a id="btnAdminAccess" href="/login" class="px-3.5 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition flex items-center gap-2 shadow-md shadow-indigo-600/30">
+        <i class="fa-solid fa-right-to-bracket"></i>
+        <span>Login Admin</span>
+      </a>
     </div>
   </header>
 
@@ -472,9 +478,20 @@
       initMap();
       initCharts();
       applyTheme(currentTheme);
+      checkAdminLoginStatus();
       fetchAnalyticsData();
       fetchTableData();
     });
+
+    function checkAdminLoginStatus() {
+      const token = localStorage.getItem('auth_token');
+      const btnAdmin = document.getElementById('btnAdminAccess');
+      if (token && btnAdmin) {
+        btnAdmin.href = '/admin';
+        btnAdmin.innerHTML = '<i class="fa-solid fa-user-shield"></i><span>Admin Panel</span>';
+        btnAdmin.className = 'px-3.5 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition flex items-center gap-2 shadow-md shadow-emerald-600/30';
+      }
+    }
 
     // Theme Switcher Logic
     function applyTheme(theme) {
