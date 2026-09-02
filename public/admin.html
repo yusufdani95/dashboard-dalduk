@@ -514,6 +514,14 @@
           </div>
         </div>
 
+        <div class="pt-4 border-t border-slate-500/20 flex justify-end gap-3">
+          <button type="button" id="btnCancelUser" class="px-4 py-2 theme-btn-sec text-xs font-semibold rounded-xl border">Batal</button>
+          <button type="submit" id="btnSaveUser" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/30">Simpan User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL: IMPOR DATA SEKOLAH -->
   <div id="modalImportSekolah" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="glass-modal w-full max-w-2xl rounded-2xl p-6 shadow-2xl relative max-h-[90vh] flex flex-col">
@@ -1219,8 +1227,8 @@
       document.getElementById('modalImportSekolah').classList.remove('hidden');
     }
 
-    document.getElementById('closeModalImport').addEventListener('click', () => document.getElementById('modalImportSekolah').classList.add('hidden'));
-    document.getElementById('btnCancelImport').addEventListener('click', () => document.getElementById('modalImportSekolah').classList.add('hidden'));
+    document.getElementById('closeModalImport')?.addEventListener('click', () => document.getElementById('modalImportSekolah').classList.add('hidden'));
+    document.getElementById('btnCancelImport')?.addEventListener('click', () => document.getElementById('modalImportSekolah').classList.add('hidden'));
 
     function downloadImportTemplate() {
       const templateData = [
@@ -1496,25 +1504,29 @@
     }
 
     // Event Listeners for Filters & Search & Pagination Limits
-    document.getElementById('searchSekolahInput').addEventListener('input', () => loadSekolahData(1));
-    document.getElementById('filterJenjangSelect').addEventListener('change', () => loadSekolahData(1));
-    document.getElementById('filterKlasifikasiSelect').addEventListener('change', () => loadSekolahData(1));
-    document.getElementById('filterWilayahSelect').addEventListener('change', () => loadSekolahData(1));
-    document.getElementById('sekolahLimitSelect').addEventListener('change', (e) => {
+    document.getElementById('searchSekolahInput')?.addEventListener('input', () => loadSekolahData(1));
+    document.getElementById('filterJenjangSelect')?.addEventListener('change', () => loadSekolahData(1));
+    document.getElementById('filterKlasifikasiSelect')?.addEventListener('change', () => loadSekolahData(1));
+    document.getElementById('filterWilayahSelect')?.addEventListener('change', () => loadSekolahData(1));
+    document.getElementById('sekolahLimitSelect')?.addEventListener('change', (e) => {
       sekolahState.limit = parseInt(e.target.value, 10);
       loadSekolahData(1);
     });
 
-    document.getElementById('searchUserInput').addEventListener('input', () => loadUsersData(1));
-    document.getElementById('filterRoleSelect').addEventListener('change', () => loadUsersData(1));
-    document.getElementById('usersLimitSelect').addEventListener('change', (e) => {
+    document.getElementById('searchUserInput')?.addEventListener('input', () => loadUsersData(1));
+    document.getElementById('filterRoleSelect')?.addEventListener('change', () => loadUsersData(1));
+    document.getElementById('usersLimitSelect')?.addEventListener('change', (e) => {
       usersState.limit = parseInt(e.target.value, 10);
       loadUsersData(1);
     });
 
     // Initialize on Load
     window.addEventListener('DOMContentLoaded', async () => {
-      await checkAuth();
+      try {
+        await checkAuth();
+      } catch (e) {
+        console.error('Auth check error:', e);
+      }
       loadSekolahData(1);
     });
   </script>
