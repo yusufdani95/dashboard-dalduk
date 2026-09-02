@@ -3,7 +3,7 @@ import { jwt } from '@elysiajs/jwt';
 import { jwtSecret } from '../auth';
 import { db } from '../../db';
 import { users } from '../../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 
 // Auth Guard Helper
 export async function authenticateAndAuthorize(
@@ -301,6 +301,57 @@ export const usersRoutes = new Elysia({ prefix: '/api/users' })
       detail: {
         tags: ['Users'],
         summary: 'Delete user by ID (Admin Only)',
+      },
+    }
+  )
+
+  // POST /api/users/batch-delete - Delete multiple users (admin only)
+  .post(
+    '/batch-delete',
+    async ({ body, jwt, cookie: { auth_token }, headers, set }) => {
+      const auth = await authenticateAndAuthorize(jwt, auth_token, headers, ['admin']);
+      if (!auth.authorized) {
+        set.status = auth.status;
+        return { success: false, error: auth.error };
+      }
+
+      try {
+        const ids = body.ids;
+        if (!ids || ids.length === 0) {
+          set.status = 400;
+          return { success: false, error: 'Tidak ada pengguna yang dipilih' };
+        }
+
+        // Filter out self ID if selected
+        const currentUserId = auth.user?.idUser;
+        const validIds = ids.filter((id) => id !== currentUserId);
+
+        if (validIds.length === 0) {
+          set.status = 400;
+          return { success: false, error: 'Anda tidak dapat menghapus akun Anda sendiri' };
+        }
+
+        await db.delete(users).where(inArray(users.idUser, validIds));
+
+        return {
+          success: true,
+          message: `${validIds.length} pengguna berhasil dihapus`,
+        };
+      } catch (error: any) {
+        set.status = 500;
+        return {
+          success: false,
+          error: error?.message || 'Gagal menghapus beberapa pengguna',
+        };
+      }
+    },
+    {
+      body: t.Object({
+        ids: t.Array(t.Numeric()),
+      }),
+      detail: {
+        tags: ['Users'],
+        summary: 'Batch delete users by list of IDs (Admin Only)',
       },
     }
   );

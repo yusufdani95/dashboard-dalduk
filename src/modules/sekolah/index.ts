@@ -4,7 +4,7 @@ import { jwtSecret } from '../auth';
 import { authenticateAndAuthorize } from '../users';
 import { db } from '../../db';
 import { dataSekolah } from '../../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 
 export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
   .use(
@@ -351,6 +351,48 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
       detail: {
         tags: ['Sekolah'],
         summary: 'Delete a sekolah record by NPSN (Admin & Operator Sekolah)',
+      },
+    }
+  )
+
+  // POST /api/sekolah/batch-delete - Delete multiple sekolah records (Admin & Operator Sekolah)
+  .post(
+    '/batch-delete',
+    async ({ body, jwt, cookie: { auth_token }, headers, set }) => {
+      const auth = await authenticateAndAuthorize(jwt, auth_token, headers, ['admin', 'operator_sekolah']);
+      if (!auth.authorized) {
+        set.status = auth.status;
+        return { success: false, error: auth.error };
+      }
+
+      try {
+        const npsns = body.npsns;
+        if (!npsns || npsns.length === 0) {
+          set.status = 400;
+          return { success: false, error: 'Tidak ada data sekolah yang dipilih' };
+        }
+
+        await db.delete(dataSekolah).where(inArray(dataSekolah.npsn, npsns));
+
+        return {
+          success: true,
+          message: `${npsns.length} data sekolah berhasil dihapus`,
+        };
+      } catch (error: any) {
+        set.status = 500;
+        return {
+          success: false,
+          error: error?.message || 'Gagal menghapus beberapa data sekolah',
+        };
+      }
+    },
+    {
+      body: t.Object({
+        npsns: t.Array(t.Numeric()),
+      }),
+      detail: {
+        tags: ['Sekolah'],
+        summary: 'Batch delete sekolah records by list of NPSNs',
       },
     }
   );

@@ -195,10 +195,16 @@
             <h2 class="text-xl font-bold theme-text tracking-tight">Kelola Data Sekolah</h2>
             <p class="text-xs theme-muted mt-1">Tambah, edit, dan hapus data sekolah yang ditampilkan pada Dashboard publik</p>
           </div>
-          <button id="btnTambahSekolah" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
-            <i class="fa-solid fa-plus"></i>
-            <span>Tambah Sekolah</span>
-          </button>
+          <div class="flex items-center gap-3">
+            <button id="btnBatchDeleteSekolah" onclick="batchDeleteSekolah()" class="px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-red-600/20 hidden">
+              <i class="fa-solid fa-trash"></i>
+              <span id="batchSekolahLabel">Hapus Terpilih (0)</span>
+            </button>
+            <button id="btnTambahSekolah" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
+              <i class="fa-solid fa-plus"></i>
+              <span>Tambah Sekolah</span>
+            </button>
+          </div>
         </div>
 
         <!-- Filters & Search -->
@@ -243,6 +249,9 @@
             <table class="w-full text-left text-sm theme-text">
               <thead class="theme-table-head text-xs uppercase font-semibold border-b">
                 <tr>
+                  <th class="px-4 py-3.5 text-center w-10">
+                    <input type="checkbox" id="selectAllSekolah" onchange="toggleSelectAllSekolah(this)" class="w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500">
+                  </th>
                   <th class="px-5 py-3.5">NPSN</th>
                   <th class="px-5 py-3.5">Nama Sekolah</th>
                   <th class="px-5 py-3.5">Jenjang</th>
@@ -286,10 +295,16 @@
             <h2 class="text-xl font-bold theme-text tracking-tight">Kelola Pengguna (Users & Access)</h2>
             <p class="text-xs theme-muted mt-1">Manajemen akun pengguna dan hak akses peran (Admin, Operator Sekolah, Viewer)</p>
           </div>
-          <button id="btnTambahUser" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
-            <i class="fa-solid fa-user-plus"></i>
-            <span>Tambah User</span>
-          </button>
+          <div class="flex items-center gap-3">
+            <button id="btnBatchDeleteUsers" onclick="batchDeleteUsers()" class="px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-red-600/20 hidden">
+              <i class="fa-solid fa-trash"></i>
+              <span id="batchUsersLabel">Hapus Terpilih (0)</span>
+            </button>
+            <button id="btnTambahUser" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
+              <i class="fa-solid fa-user-plus"></i>
+              <span>Tambah User</span>
+            </button>
+          </div>
         </div>
 
         <!-- Search & Filter -->
@@ -315,6 +330,9 @@
             <table class="w-full text-left text-sm theme-text">
               <thead class="theme-table-head text-xs uppercase font-semibold border-b">
                 <tr>
+                  <th class="px-4 py-3.5 text-center w-10">
+                    <input type="checkbox" id="selectAllUsers" onchange="toggleSelectAllUsers(this)" class="w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500">
+                  </th>
                   <th class="px-5 py-3.5">ID</th>
                   <th class="px-5 py-3.5">Pengguna</th>
                   <th class="px-5 py-3.5">Email</th>
@@ -635,8 +653,12 @@
 
     function renderSekolahTable(items) {
       const tbody = document.getElementById('sekolahTableBody');
+      const selectAll = document.getElementById('selectAllSekolah');
+      if (selectAll) selectAll.checked = false;
+      updateSekolahBatchState();
+
       if (!items || items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="px-5 py-8 text-center theme-muted">Tidak ada data sekolah ditemukan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="px-5 py-8 text-center theme-muted">Tidak ada data sekolah ditemukan.</td></tr>`;
         return;
       }
 
@@ -644,6 +666,9 @@
 
       tbody.innerHTML = items.map(item => `
         <tr class="theme-table-row transition">
+          <td class="px-4 py-3 text-center">
+            ${isReadOnly ? '' : `<input type="checkbox" value="${item.npsn}" class="cb-sekolah w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500" onchange="updateSekolahBatchState()">`}
+          </td>
           <td class="px-5 py-3 font-mono text-xs text-indigo-500 font-bold">${item.npsn}</td>
           <td class="px-5 py-3 font-medium theme-text">${item.namaSekolah}</td>
           <td class="px-5 py-3 text-xs theme-text">${item.jenjang}</td>
@@ -804,13 +829,20 @@
 
     function renderUsersTable(items) {
       const tbody = document.getElementById('usersTableBody');
+      const selectAll = document.getElementById('selectAllUsers');
+      if (selectAll) selectAll.checked = false;
+      updateUsersBatchState();
+
       if (!items || items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="px-5 py-8 text-center theme-muted">Tidak ada pengguna ditemukan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="px-5 py-8 text-center theme-muted">Tidak ada pengguna ditemukan.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = items.map(u => `
         <tr class="theme-table-row transition">
+          <td class="px-4 py-3 text-center">
+            <input type="checkbox" value="${u.idUser}" class="cb-user w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500" onchange="updateUsersBatchState()" ${u.idUser === currentUser?.idUser ? 'disabled title="Tidak dapat memilih akun sendiri"' : ''}>
+          </td>
           <td class="px-5 py-3 font-mono text-xs text-indigo-500 font-bold">#${u.idUser}</td>
           <td class="px-5 py-3">
             <div class="font-medium theme-text">${u.namaLengkap}</div>
@@ -956,6 +988,130 @@
         alert('Terjadi kesalahan koneksi.');
       }
     });
+
+    // --- BATCH DELETE LOGIC FOR SEKOLAH ---
+    function toggleSelectAllSekolah(master) {
+      const checkboxes = document.querySelectorAll('.cb-sekolah');
+      checkboxes.forEach(cb => cb.checked = master.checked);
+      updateSekolahBatchState();
+    }
+
+    function updateSekolahBatchState() {
+      const selected = Array.from(document.querySelectorAll('.cb-sekolah:checked')).map(cb => Number(cb.value));
+      const btnBatch = document.getElementById('btnBatchDeleteSekolah');
+      const labelBatch = document.getElementById('batchSekolahLabel');
+      const master = document.getElementById('selectAllSekolah');
+      const allCheckboxes = document.querySelectorAll('.cb-sekolah');
+
+      if (master && allCheckboxes.length > 0 && selected.length === allCheckboxes.length) {
+        master.checked = true;
+      } else if (master) {
+        master.checked = false;
+      }
+
+      if (btnBatch && labelBatch) {
+        if (selected.length > 0) {
+          btnBatch.classList.remove('hidden');
+          labelBatch.innerText = `Hapus Terpilih (${selected.length})`;
+        } else {
+          btnBatch.classList.add('hidden');
+        }
+      }
+    }
+
+    async function batchDeleteSekolah() {
+      const selected = Array.from(document.querySelectorAll('.cb-sekolah:checked')).map(cb => Number(cb.value));
+      if (selected.length === 0) return;
+
+      if (!confirm(`Apakah Anda yakin ingin menghapus ${selected.length} data sekolah yang dipilih?`)) return;
+
+      const token = localStorage.getItem('auth_token');
+      try {
+        const res = await fetch('/api/sekolah/batch-delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ npsns: selected })
+        });
+
+        const result = await res.json();
+        if (res.ok && result.success) {
+          alert(result.message);
+          const master = document.getElementById('selectAllSekolah');
+          if (master) master.checked = false;
+          updateSekolahBatchState();
+          loadSekolahData(sekolahState.page);
+        } else {
+          alert(result.error || 'Gagal menghapus data sekolah terpilih.');
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan koneksi.');
+      }
+    }
+
+    // --- BATCH DELETE LOGIC FOR USERS ---
+    function toggleSelectAllUsers(master) {
+      const checkboxes = document.querySelectorAll('.cb-user:not(:disabled)');
+      checkboxes.forEach(cb => cb.checked = master.checked);
+      updateUsersBatchState();
+    }
+
+    function updateUsersBatchState() {
+      const selected = Array.from(document.querySelectorAll('.cb-user:checked')).map(cb => Number(cb.value));
+      const btnBatch = document.getElementById('btnBatchDeleteUsers');
+      const labelBatch = document.getElementById('batchUsersLabel');
+      const master = document.getElementById('selectAllUsers');
+      const allCheckboxes = document.querySelectorAll('.cb-user:not(:disabled)');
+
+      if (master && allCheckboxes.length > 0 && selected.length === allCheckboxes.length) {
+        master.checked = true;
+      } else if (master) {
+        master.checked = false;
+      }
+
+      if (btnBatch && labelBatch) {
+        if (selected.length > 0) {
+          btnBatch.classList.remove('hidden');
+          labelBatch.innerText = `Hapus Terpilih (${selected.length})`;
+        } else {
+          btnBatch.classList.add('hidden');
+        }
+      }
+    }
+
+    async function batchDeleteUsers() {
+      const selected = Array.from(document.querySelectorAll('.cb-user:checked')).map(cb => Number(cb.value));
+      if (selected.length === 0) return;
+
+      if (!confirm(`Apakah Anda yakin ingin menghapus ${selected.length} pengguna yang dipilih?`)) return;
+
+      const token = localStorage.getItem('auth_token');
+      try {
+        const res = await fetch('/api/users/batch-delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ ids: selected })
+        });
+
+        const result = await res.json();
+        if (res.ok && result.success) {
+          alert(result.message);
+          const master = document.getElementById('selectAllUsers');
+          if (master) master.checked = false;
+          updateUsersBatchState();
+          loadUsersData(usersState.page);
+        } else {
+          alert(result.error || 'Gagal menghapus pengguna terpilih.');
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan koneksi.');
+      }
+    }
 
     // Event Listeners for Filters & Search & Pagination Limits
     document.getElementById('searchSekolahInput').addEventListener('input', () => loadSekolahData(1));
