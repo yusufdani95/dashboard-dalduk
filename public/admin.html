@@ -198,6 +198,10 @@
             <p class="text-xs theme-muted mt-1">Tambah, edit, dan hapus data sekolah yang ditampilkan pada Dashboard publik</p>
           </div>
           <div class="flex items-center gap-3">
+            <button id="btnExportSekolah" onclick="exportSekolahExcel('xls')" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-emerald-600/20">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>Ekspor Excel (.xls)</span>
+            </button>
             <button id="btnBatchDeleteSekolah" onclick="batchDeleteSekolah()" class="px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-red-600/20 hidden">
               <i class="fa-solid fa-trash"></i>
               <span id="batchSekolahLabel">Hapus Terpilih (0)</span>
@@ -299,6 +303,10 @@
           </div>
           <div class="flex items-center gap-3">
             <button id="btnBatchDeleteUsers" onclick="batchDeleteUsers()" class="px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-red-600/20 hidden">
+              <button id="btnExportSekolah" onclick="exportSekolahExcel('xls')" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-emerald-600/20">
+                <i class="fa-solid fa-file-excel"></i>
+                <span>Ekspor Excel (.xls)</span>
+              </button>
               <i class="fa-solid fa-trash"></i>
               <span id="batchUsersLabel">Hapus Terpilih (0)</span>
             </button>
@@ -1070,8 +1078,8 @@
       }
     });
 
-    // --- EXCEL EXPORT LOGIC FOR SEKOLAH ---
-    async function exportSekolahExcel() {
+    // --- EXCEL EXPORT LOGIC FOR SEKOLAH (.xls) ---
+    async function exportSekolahExcel(format = 'xls') {
       const search = document.getElementById('searchSekolahInput').value.trim();
       const jenjang = document.getElementById('filterJenjangSelect').value;
       const klasifikasi = document.getElementById('filterKlasifikasiSelect').value;
@@ -1107,8 +1115,14 @@
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Data Sekolah");
 
-        const filename = `Data_Sekolah_Dalduk_Banten_${new Date().toISOString().slice(0, 10)}.xlsx`;
-        XLSX.writeFile(workbook, filename);
+        const ext = format === 'xlsx' ? 'xlsx' : 'xls';
+        const filename = `Data_Sekolah_Dalduk_Banten_${new Date().toISOString().slice(0, 10)}.${ext}`;
+        
+        if (ext === 'xls') {
+          XLSX.writeFile(workbook, filename, { bookType: 'biff8' });
+        } else {
+          XLSX.writeFile(workbook, filename);
+        }
       } catch (err) {
         console.error(err);
         alert('Terjadi kesalahan saat mengunduh file Excel.');
