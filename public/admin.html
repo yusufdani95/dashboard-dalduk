@@ -462,10 +462,27 @@
           </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-semibold uppercase theme-muted mb-1" id="userPasswordLabel">Password</label>
-          <input type="password" id="userPasswordInput" placeholder="••••••••" class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
-          <p class="text-[11px] theme-muted mt-1 hidden" id="passwordHint">Biarkan kosong jika tidak ingin mengubah password.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1" id="userPasswordLabel">Password</label>
+            <div class="relative">
+              <input type="password" id="userPasswordInput" placeholder="••••••••" class="w-full pl-3.5 pr-10 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+              <button type="button" id="toggleUserPassword" class="absolute right-3 top-3 theme-muted hover:text-indigo-500 text-xs cursor-pointer">
+                <i class="fa-solid fa-eye" id="iconUserPassword"></i>
+              </button>
+            </div>
+            <p class="text-[11px] theme-muted mt-1 hidden" id="passwordHint">Kosongkan jika tidak diubah.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1" id="userConfirmPasswordLabel">Konfirmasi Password</label>
+            <div class="relative">
+              <input type="password" id="userConfirmPasswordInput" placeholder="••••••••" class="w-full pl-3.5 pr-10 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+              <button type="button" id="toggleUserConfirmPassword" class="absolute right-3 top-3 theme-muted hover:text-indigo-500 text-xs cursor-pointer">
+                <i class="fa-solid fa-eye" id="iconUserConfirmPassword"></i>
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
@@ -894,15 +911,54 @@
       container.innerHTML = html;
     }
 
-    // Modal User Handlers
+    // Modal User Handlers & Password Toggles
     const modalUser = document.getElementById('modalUser');
+
+    function resetPasswordVisibility() {
+      const pInput = document.getElementById('userPasswordInput');
+      const pIcon = document.getElementById('iconUserPassword');
+      const cInput = document.getElementById('userConfirmPasswordInput');
+      const cIcon = document.getElementById('iconUserConfirmPassword');
+
+      pInput.type = 'password';
+      pIcon.className = 'fa-solid fa-eye';
+      cInput.type = 'password';
+      cIcon.className = 'fa-solid fa-eye';
+    }
+
+    document.getElementById('toggleUserPassword').addEventListener('click', () => {
+      const input = document.getElementById('userPasswordInput');
+      const icon = document.getElementById('iconUserPassword');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+      }
+    });
+
+    document.getElementById('toggleUserConfirmPassword').addEventListener('click', () => {
+      const input = document.getElementById('userConfirmPasswordInput');
+      const icon = document.getElementById('iconUserConfirmPassword');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+      }
+    });
+
     document.getElementById('btnTambahUser').addEventListener('click', () => {
       document.getElementById('modalUserTitle').innerText = 'Tambah Pengguna Baru';
       document.getElementById('formUser').reset();
       document.getElementById('userIdInput').value = '';
       document.getElementById('userUsernameInput').readOnly = false;
       document.getElementById('userPasswordInput').required = true;
+      document.getElementById('userConfirmPasswordInput').required = true;
       document.getElementById('passwordHint').classList.add('hidden');
+      resetPasswordVisibility();
       modalUser.classList.remove('hidden');
     });
 
@@ -918,10 +974,13 @@
       document.getElementById('userUsernameInput').readOnly = true;
       document.getElementById('userEmailInput').value = u.email;
       document.getElementById('userPasswordInput').value = '';
+      document.getElementById('userConfirmPasswordInput').value = '';
       document.getElementById('userPasswordInput').required = false;
+      document.getElementById('userConfirmPasswordInput').required = false;
       document.getElementById('passwordHint').classList.remove('hidden');
       document.getElementById('userRoleInput').value = u.roleId;
       document.getElementById('userStatusInput').value = u.isActive ? 'true' : 'false';
+      resetPasswordVisibility();
       modalUser.classList.remove('hidden');
     };
 
@@ -949,12 +1008,32 @@
       e.preventDefault();
       const idUser = document.getElementById('userIdInput').value;
       const token = localStorage.getItem('auth_token');
+      const password = document.getElementById('userPasswordInput').value;
+      const confirmPassword = document.getElementById('userConfirmPasswordInput').value;
+
+      if (!idUser) {
+        if (!password) {
+          alert('Password wajib diisi untuk pengguna baru.');
+          return;
+        }
+        if (password !== confirmPassword) {
+          alert('Konfirmasi password tidak cocok dengan password yang dimasukkan!');
+          return;
+        }
+      } else {
+        if (password || confirmPassword) {
+          if (password !== confirmPassword) {
+            alert('Konfirmasi password baru tidak cocok dengan password yang dimasukkan!');
+            return;
+          }
+        }
+      }
 
       const payload = {
         namaLengkap: document.getElementById('userNamaLengkapInput').value.trim(),
         username: document.getElementById('userUsernameInput').value.trim(),
         email: document.getElementById('userEmailInput').value.trim(),
-        password: document.getElementById('userPasswordInput').value,
+        password: password,
         roleId: document.getElementById('userRoleInput').value,
         isActive: document.getElementById('userStatusInput').value === 'true',
       };
