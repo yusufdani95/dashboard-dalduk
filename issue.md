@@ -1,46 +1,64 @@
-# Issue: Implementasi Data Sekolah dan Dashboard Pemetaan
+# Perencanaan Modul Autentikasi dan Manajemen Admin (RBAC)
 
-## Deskripsi Tugas
-Tugas ini mencakup penambahan skema database untuk data sekolah, pembuatan API, serta pembuatan antarmuka dashboard untuk memvisualisasikan data tersebut menggunakan diagram dan peta pesebaran.
+Dokumen ini berisi perencanaan untuk pembuatan sistem autentikasi, manajemen pengguna (users), dan hak akses (Role-Based Access Control) yang akan diimplementasikan selanjutnya.
 
-## 1. Backend: Skema Database & API
-Proyek backend ini menggunakan **Bun**, **ElysiaJS**, dan **Drizzle ORM** (MySQL).
+## 1. Struktur Database: Tabel `users`
 
-### A. Definisi Skema (Drizzle ORM)
-Buat tabel `data_sekolah` di dalam skema Drizzle (misal: `src/db/schema/index.ts` atau file schema baru).
+Buat tabel `users` untuk menyimpan data pengguna dengan spesifikasi skema sebagai berikut:
 
-**Spesifikasi kolom:**
-1. `npsn`: Integer (Primary Key, Auto Increment)
-2. `nama_sekolah`: Varchar (150), Not Null
-3. `jenjang`: Enum `('SD / Sederajat', 'SMP / Sederajat', 'SMA / Sederajat')`, Not Null
-4. `klasifikasi`: Enum `('Terdaftar', 'Dasar', 'Paripurna')`, Not Null
-5. `wilayah`: Varchar (255), Not Null
-*(Bila diperlukan untuk akurasi peta, pertimbangkan penambahan kolom opsional `latitude` dan `longitude`)*
+- `id_user`: `INT AUTO_INCREMENT` (Primary Key)
+- `username`: `VARCHAR(50)` (Unique)
+- `email`: `VARCHAR(150)` (Unique)
+- `password`: `VARCHAR(255)` (Harus disimpan dalam bentuk hash menggunakan **Bcrypt**)
+- `nama_lengkap`: `VARCHAR(150)`
+- `role_id` / `level_akses`: `ENUM('admin', 'operator_sekolah', 'viewer')`
+- `is_active`: `TINYINT(1)` atau `BOOLEAN` (Default: `true` / `1`)
 
-*Catatan: Setelah kode skema dibuat, jalankan command `bun run db:generate` dan `bun run db:push` untuk sinkronisasi ke database.*
+*Catatan untuk implementasi:*
+Gunakan Drizzle ORM untuk membuat skema tabel ini di konfigurasi database proyek.
 
-### B. Pembuatan API Endpoints
-Buat modul rute baru (misal: `src/modules/sekolah/index.ts`) dan daftarkan di `src/index.ts`.
-- `GET /api/sekolah`: Mengambil list semua data sekolah.
-- `GET /api/sekolah/stats`: Mengembalikan data agregasi (jumlah sekolah per jenjang, jumlah per klasifikasi) untuk memudahkan render grafik di frontend.
+## 2. Modul Autentikasi (Login & Logout)
 
-## 2. Frontend: Dashboard & Visualisasi
-Buat tampilan dashboard yang akan mengkonsumsi API di atas.
+- Buat endpoint API untuk proses autentikasi/Login.
+- Lakukan verifikasi password menggunakan Bcrypt.
+- Gunakan JWT (JSON Web Token) atau Cookie Session yang aman untuk menyimpan sesi pengguna yang sedang login.
+- Buat middleware untuk memproteksi endpoint (Route Protection) dan pengecekan hak akses (Role-Based Authorization).
 
-### A. Visualisasi Diagram (Charts)
-Tampilkan diagram yang mudah dibaca menggunakan library pilihan (seperti Chart.js, Recharts, atau ApexCharts).
-- **Pie/Donut Chart**: Menampilkan proporsi sekolah berdasarkan **jenjang**.
-- **Bar Chart**: Menampilkan jumlah sekolah berdasarkan **klasifikasi**.
+## 3. Modul Manajemen Pengguna (CRUD Users)
 
-### B. Peta Pesebaran Wilayah (Maps)
-Tampilkan persebaran sekolah menggunakan library interaktif (seperti Leaflet.js atau Google Maps).
-- Tampilkan marker/pin penanda sekolah pada peta.
-- Karena kolom yang tersedia adalah nama `wilayah` (string), Anda mungkin perlu mengelompokkan data per wilayah polygon, menggunakan Geocoding API untuk meresolusi titik kordinat, atau menyesuaikan skema backend dengan menambahkan latitude/longitude.
-- Tiap marker di peta sebaiknya menampilkan *tooltip/popup* berisi Nama Sekolah, Jenjang, dan Klasifikasinya saat di-klik.
+Buatkan antarmuka (halaman/menu Admin) dan endpoint API untuk mengelola data pengguna. 
+Fitur yang harus ada:
+- **Create**: Menambahkan pengguna baru (termasuk melakukan proses hash pada password sebelum disimpan).
+- **Read**: Menampilkan daftar pengguna dalam bentuk tabel (dilengkapi fitur pencarian dan paginasi).
+- **Update**: Mengedit profil pengguna, mereset password, mengubah `role_id`, atau mengaktifkan/menonaktifkan akun pengguna (`is_active`).
+- **Delete**: Menghapus data pengguna (bisa menggunakan metode Soft Delete atau Hard Delete).
 
-## Kriteria Penerimaan (Acceptance Criteria - DoD)
-- [ ] Tabel `data_sekolah` terbuat di database.
-- [ ] API endpoint dapat mengembalikan respons JSON data sekolah dan terdaftar di Swagger.
-- [ ] Dashboard menampilkan diagram statistik data sekolah.
-- [ ] Dashboard menampilkan komponen peta dengan indikator wilayah/sekolah.
-- [ ] Kode rapi, di-type dengan TypeScript secara ketat, dan tidak ada error saat build.
+*Hak Akses:* Modul CRUD Pengguna ini **hanya boleh diakses** oleh pengguna dengan `role_id = 'admin'`.
+
+## 4. Modul Manajemen Data Sekolah (CRUD Sekolah)
+
+Buatkan halaman/menu Admin khusus untuk mengelola master data sekolah yang nantinya akan ditampilkan secara publik di halaman depan (Dashboard Peta).
+Fitur yang harus ada:
+- **Create**: Form untuk menambah data sekolah baru, mencakup pengisian letak koordinat (latitude & longitude) dan profil detail sekolah.
+- **Read**: Tabel daftar sekolah di panel admin.
+- **Update**: Mengedit detail data sekolah yang sudah ada.
+- **Delete**: Menghapus data sekolah.
+
+*Ketentuan Hak Akses:* 
+- `admin`: Memiliki hak penuh (CRUD) terhadap seluruh data sekolah.
+- `operator_sekolah`: Dapat menambahkan, mengubah, atau menghapus data sekolah (atau dibatasi hanya untuk sekolah wilayah tertentu sesuai pengembangan lebih lanjut).
+- `viewer`: Hanya memiliki hak untuk melihat data pada Dashboard publik atau Admin Panel tanpa akses memodifikasi data.
+
+## 5. Integrasi Antarmuka (Admin Panel)
+
+- Buat layout halaman khusus Admin Panel yang terpisah atau berbeda akses dari halaman dashboard publik (`public/index.html`).
+- Tambahkan menu navigasi (sidebar/header) yang rapi, meliputi:
+  - Dashboard Admin
+  - Kelola Pengguna (Users)
+  - Kelola Data Sekolah
+  - Logout
+- Pastikan seluruh form input (tambah/edit) menggunakan validasi yang ketat dan memberikan *feedback* (pesan sukses/error) yang jelas kepada pengguna.
+
+---
+**Instruksi Tambahan untuk Junior Programmer / AI Model:**
+Silakan gunakan teknologi yang sudah ada di proyek ini, yaitu **ElysiaJS** untuk backend API dan **Drizzle ORM** untuk pengelolaan database MySQL/MariaDB. Pastikan untuk selalu mementingkan keamanan, validasi input, dan memisahkan dengan jelas antara akses publik dan otentikasi admin.
