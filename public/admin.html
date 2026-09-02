@@ -33,33 +33,39 @@
       --sidebar-bg: rgba(15, 23, 42, 0.6);
       --card-bg: rgba(30, 41, 59, 0.7);
       --card-border: rgba(255, 255, 255, 0.08);
-      --modal-bg: rgba(15, 23, 42, 0.95);
-      --text-color: #f8fafc;
-      --title-color: #ffffff;
-      --sub-color: #94a3b8;
+      --modal-bg: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
       --input-bg: rgba(15, 23, 42, 0.85);
       --input-border: #334155;
       --table-head-bg: rgba(15, 23, 42, 0.95);
+      --table-row-hover: rgba(30, 41, 59, 0.4);
+      --btn-sec-bg: #1e293b;
+      --btn-sec-border: #334155;
+      --btn-sec-text: #cbd5e1;
     }
 
     html.light {
-      --bg-color: #f1f5f9;
-      --header-bg: rgba(255, 255, 255, 0.95);
-      --sidebar-bg: rgba(255, 255, 255, 0.8);
-      --card-bg: rgba(255, 255, 255, 0.9);
-      --card-border: rgba(0, 0, 0, 0.08);
-      --modal-bg: rgba(255, 255, 255, 0.98);
-      --text-color: #0f172a;
-      --title-color: #0f172a;
-      --sub-color: #64748b;
-      --input-bg: #ffffff;
+      --bg-color: #f8fafc;
+      --header-bg: #ffffff;
+      --sidebar-bg: #ffffff;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --modal-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --input-bg: #f1f5f9;
       --input-border: #cbd5e1;
-      --table-head-bg: #e2e8f0;
+      --table-head-bg: #f1f5f9;
+      --table-row-hover: #f8fafc;
+      --btn-sec-bg: #ffffff;
+      --btn-sec-border: #cbd5e1;
+      --btn-sec-text: #334155;
     }
 
     body {
       background-color: var(--bg-color);
-      color: var(--text-color);
+      color: var(--text-main);
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
@@ -74,72 +80,81 @@
     }
 
     .glass-panel {
-      background: var(--card-bg);
+      background: var(--card-bg) !important;
       backdrop-filter: blur(12px);
-      border: 1px solid var(--card-border);
+      border: 1px solid var(--card-border) !important;
+      box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.05);
       transition: background 0.3s ease, border-color 0.3s ease;
     }
 
     .glass-modal {
-      background: var(--modal-bg);
+      background: var(--modal-bg) !important;
       backdrop-filter: blur(20px);
-      border: 1px solid var(--card-border);
-      color: var(--text-color);
+      border: 1px solid var(--card-border) !important;
+      color: var(--text-main) !important;
     }
 
-    .theme-title { color: var(--title-color) !important; }
-    .theme-sub { color: var(--sub-color) !important; }
+    .theme-text { color: var(--text-main) !important; }
+    .theme-muted { color: var(--text-muted) !important; }
     
-    html.light .text-white { color: #0f172a !important; }
-    html.light .bg-slate-900 { background-color: #f8fafc !important; }
-    html.light .bg-slate-900\/80 { background-color: #ffffff !important; }
-    html.light .bg-slate-900\/90 { background-color: #f1f5f9 !important; }
-    html.light .bg-slate-900\/60 { background-color: #f8fafc !important; }
-    html.light .border-slate-800 { border-color: #cbd5e1 !important; }
-    html.light .border-slate-700 { border-color: #cbd5e1 !important; }
-    html.light .text-slate-300 { color: #334155 !important; }
-    html.light .text-slate-400 { color: #64748b !important; }
-    html.light .bg-slate-800 { background-color: #e2e8f0 !important; }
-    html.light .bg-slate-800\/80 { background-color: #e2e8f0 !important; }
-    html.light .bg-slate-800\/40 { background-color: #f1f5f9 !important; }
+    .theme-input {
+      background-color: var(--input-bg) !important;
+      border-color: var(--input-border) !important;
+      color: var(--text-main) !important;
+    }
+
+    .theme-btn-sec {
+      background-color: var(--btn-sec-bg) !important;
+      border-color: var(--btn-sec-border) !important;
+      color: var(--btn-sec-text) !important;
+    }
+
+    .theme-table-head {
+      background-color: var(--table-head-bg) !important;
+      color: var(--text-muted) !important;
+    }
+
+    .theme-table-row:hover {
+      background-color: var(--table-row-hover) !important;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased">
 
   <!-- Top Navigation Header -->
-  <header class="border-b sticky top-0 z-30 px-6 py-3.5 flex items-center justify-between">
+  <header class="border-b sticky top-0 z-30 px-6 py-3.5 flex items-center justify-between shadow-sm">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold">
+      <div class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-500 border border-indigo-500/30 flex items-center justify-center font-bold">
         <i class="fa-solid fa-gauge-high text-lg"></i>
       </div>
       <div>
-        <h1 class="text-base font-bold theme-title tracking-tight">Admin & Control Panel</h1>
-        <p class="text-xs theme-sub">Sistem Informasi Pengendalian Penduduk Banten</p>
+        <h1 class="text-base font-bold theme-text tracking-tight">Admin & Control Panel</h1>
+        <p class="text-xs theme-muted">Sistem Informasi Pengendalian Penduduk Banten</p>
       </div>
     </div>
 
     <div class="flex items-center gap-3">
       <!-- Theme Switcher Button -->
-      <button id="btnThemeToggle" onclick="toggleTheme()" class="px-3.5 py-2 text-xs font-medium bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 rounded-xl border border-slate-700/80 transition flex items-center gap-2 shadow-sm" title="Switch Theme">
+      <button id="btnThemeToggle" onclick="toggleTheme()" class="px-3.5 py-2 text-xs font-medium theme-btn-sec rounded-xl border transition flex items-center gap-2 shadow-sm" title="Switch Theme">
         <i id="themeIcon" class="fa-solid fa-sun text-amber-400"></i>
         <span id="themeText" class="hidden sm:inline">Light Mode</span>
       </button>
 
-      <a href="/dashboard" target="_blank" class="text-xs font-medium text-slate-300 hover:text-indigo-400 transition bg-slate-800/80 px-3 py-2 rounded-xl border border-slate-700/80 flex items-center gap-2">
-        <i class="fa-solid fa-globe text-indigo-400"></i>
+      <a href="/dashboard" target="_blank" class="text-xs font-medium theme-btn-sec px-3 py-2 rounded-xl border flex items-center gap-2 transition">
+        <i class="fa-solid fa-globe text-indigo-500"></i>
         <span class="hidden sm:inline">Dashboard Publik</span>
       </a>
 
       <!-- User Profile Badge -->
-      <div class="flex items-center gap-3 bg-slate-800/90 px-3.5 py-1.5 rounded-xl border border-slate-700/60">
+      <div class="flex items-center gap-3 glass-panel px-3.5 py-1.5 rounded-xl">
         <div class="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs" id="userAvatar">
           A
         </div>
         <div class="text-left hidden sm:block">
-          <div class="text-xs font-semibold theme-title leading-none" id="userName">Loading...</div>
-          <div class="text-[10px] text-indigo-400 mt-1 uppercase font-bold tracking-wider" id="userRoleBadge">-</div>
+          <div class="text-xs font-semibold theme-text leading-none" id="userName">Loading...</div>
+          <div class="text-[10px] text-indigo-500 mt-1 uppercase font-bold tracking-wider" id="userRoleBadge">-</div>
         </div>
-        <button id="btnLogout" class="ml-2 text-slate-400 hover:text-red-400 transition p-1.5 rounded-lg hover:bg-slate-700/50" title="Logout">
+        <button id="btnLogout" class="ml-2 theme-muted hover:text-red-500 transition p-1.5 rounded-lg hover:bg-red-500/10" title="Logout">
           <i class="fa-solid fa-right-from-bracket"></i>
         </button>
       </div>
@@ -151,21 +166,21 @@
     
     <!-- Sidebar Navigation -->
     <aside class="w-full md:w-64 border-r p-4 shrink-0">
-      <div class="text-xs font-semibold uppercase theme-sub tracking-wider mb-3 px-3">Menu Kelola</div>
+      <div class="text-xs font-semibold uppercase theme-muted tracking-wider mb-3 px-3">Menu Kelola</div>
       <nav class="space-y-1">
         <button id="navSekolah" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition bg-indigo-600 text-white shadow-md">
           <i class="fa-solid fa-school text-base w-5 text-center"></i>
           <span>Kelola Data Sekolah</span>
         </button>
 
-        <button id="navUsers" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-indigo-400">
+        <button id="navUsers" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition theme-muted hover:text-indigo-500 hover:bg-indigo-500/10">
           <i class="fa-solid fa-users text-base w-5 text-center"></i>
           <span>Kelola Users (RBAC)</span>
         </button>
       </nav>
 
-      <div class="mt-8 p-4 rounded-xl bg-slate-800/40 border border-slate-700/50 text-xs theme-sub">
-        <div class="font-semibold theme-title mb-1"><i class="fa-solid fa-circle-info text-indigo-400 mr-1"></i> Informasi Peran</div>
+      <div class="mt-8 p-4 rounded-xl glass-panel text-xs theme-muted">
+        <div class="font-semibold theme-text mb-1"><i class="fa-solid fa-circle-info text-indigo-500 mr-1"></i> Informasi Peran</div>
         <p id="roleDescription" class="leading-relaxed">Memuat hak akses...</p>
       </div>
     </aside>
@@ -177,8 +192,8 @@
       <section id="tabSekolah" class="space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="text-xl font-bold theme-title tracking-tight">Kelola Data Sekolah</h2>
-            <p class="text-xs theme-sub mt-1">Tambah, edit, dan hapus data sekolah yang ditampilkan pada Dashboard publik</p>
+            <h2 class="text-xl font-bold theme-text tracking-tight">Kelola Data Sekolah</h2>
+            <p class="text-xs theme-muted mt-1">Tambah, edit, dan hapus data sekolah yang ditampilkan pada Dashboard publik</p>
           </div>
           <button id="btnTambahSekolah" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
             <i class="fa-solid fa-plus"></i>
@@ -189,26 +204,26 @@
         <!-- Filters & Search -->
         <div class="glass-panel p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between">
           <div class="relative w-full md:w-80">
-            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
-            <input type="text" id="searchSekolahInput" placeholder="Cari nama, wilayah, alamat, NPSN..." class="w-full pl-10 pr-4 py-2 bg-slate-900/80 border border-slate-700/80 rounded-xl text-sm theme-title focus:outline-none focus:border-indigo-500">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 theme-muted text-sm"></i>
+            <input type="text" id="searchSekolahInput" placeholder="Cari nama, wilayah, alamat, NPSN..." class="w-full pl-10 pr-4 py-2 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
           </div>
 
           <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-            <select id="filterJenjangSelect" class="bg-slate-900/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs theme-title focus:outline-none focus:border-indigo-500">
+            <select id="filterJenjangSelect" class="theme-input border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500">
               <option value="">Semua Jenjang</option>
               <option value="SD / Sederajat">SD / Sederajat</option>
               <option value="SMP / Sederajat">SMP / Sederajat</option>
               <option value="SMA / Sederajat">SMA / Sederajat</option>
             </select>
 
-            <select id="filterKlasifikasiSelect" class="bg-slate-900/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs theme-title focus:outline-none focus:border-indigo-500">
+            <select id="filterKlasifikasiSelect" class="theme-input border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500">
               <option value="">Semua Klasifikasi</option>
               <option value="Terdaftar">Terdaftar</option>
               <option value="Dasar">Dasar</option>
               <option value="Paripurna">Paripurna</option>
             </select>
 
-            <select id="filterWilayahSelect" class="bg-slate-900/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs theme-title focus:outline-none focus:border-indigo-500">
+            <select id="filterWilayahSelect" class="theme-input border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500">
               <option value="">Semua Wilayah Banten</option>
               <option value="Kabupaten Serang">Kabupaten Serang</option>
               <option value="Kabupaten Tangerang">Kabupaten Tangerang</option>
@@ -225,8 +240,8 @@
         <!-- Table Sekolah -->
         <div class="glass-panel rounded-2xl overflow-hidden">
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-slate-300">
-              <thead class="bg-slate-900/90 text-xs uppercase font-semibold theme-sub border-b border-slate-800">
+            <table class="w-full text-left text-sm theme-text">
+              <thead class="theme-table-head text-xs uppercase font-semibold border-b">
                 <tr>
                   <th class="px-5 py-3.5">NPSN</th>
                   <th class="px-5 py-3.5">Nama Sekolah</th>
@@ -237,16 +252,16 @@
                   <th class="px-5 py-3.5 text-center">Aksi</th>
                 </tr>
               </thead>
-              <tbody id="sekolahTableBody" class="divide-y divide-slate-800/80">
+              <tbody id="sekolahTableBody" class="divide-y divide-slate-500/10">
                 <tr>
-                  <td colspan="7" class="px-5 py-8 text-center theme-sub">Memuat data sekolah...</td>
+                  <td colspan="7" class="px-5 py-8 text-center theme-muted">Memuat data sekolah...</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
           <!-- Pagination Footer -->
-          <div class="px-5 py-3.5 bg-slate-900/60 border-t border-slate-800 flex items-center justify-between text-xs theme-sub">
+          <div class="px-5 py-3.5 glass-panel border-t flex items-center justify-between text-xs theme-muted">
             <span id="sekolahPaginationInfo">Menampilkan 0 dari 0 data</span>
             <div class="flex items-center gap-2" id="sekolahPaginationBtns">
             </div>
@@ -258,8 +273,8 @@
       <section id="tabUsers" class="hidden space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="text-xl font-bold theme-title tracking-tight">Kelola Pengguna (Users & Access)</h2>
-            <p class="text-xs theme-sub mt-1">Manajemen akun pengguna dan hak akses peran (Admin, Operator Sekolah, Viewer)</p>
+            <h2 class="text-xl font-bold theme-text tracking-tight">Kelola Pengguna (Users & Access)</h2>
+            <p class="text-xs theme-muted mt-1">Manajemen akun pengguna dan hak akses peran (Admin, Operator Sekolah, Viewer)</p>
           </div>
           <button id="btnTambahUser" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
             <i class="fa-solid fa-user-plus"></i>
@@ -270,12 +285,12 @@
         <!-- Search & Filter -->
         <div class="glass-panel p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between">
           <div class="relative w-full md:w-80">
-            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
-            <input type="text" id="searchUserInput" placeholder="Cari username, email, nama..." class="w-full pl-10 pr-4 py-2 bg-slate-900/80 border border-slate-700/80 rounded-xl text-sm theme-title focus:outline-none focus:border-indigo-500">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 theme-muted text-sm"></i>
+            <input type="text" id="searchUserInput" placeholder="Cari username, email, nama..." class="w-full pl-10 pr-4 py-2 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
           </div>
 
           <div class="flex items-center gap-3">
-            <select id="filterRoleSelect" class="bg-slate-900/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs theme-title focus:outline-none focus:border-indigo-500">
+            <select id="filterRoleSelect" class="theme-input border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500">
               <option value="">Semua Peran (Role)</option>
               <option value="admin">Admin</option>
               <option value="operator_sekolah">Operator Sekolah</option>
@@ -287,8 +302,8 @@
         <!-- Table Users -->
         <div class="glass-panel rounded-2xl overflow-hidden">
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-slate-300">
-              <thead class="bg-slate-900/90 text-xs uppercase font-semibold theme-sub border-b border-slate-800">
+            <table class="w-full text-left text-sm theme-text">
+              <thead class="theme-table-head text-xs uppercase font-semibold border-b">
                 <tr>
                   <th class="px-5 py-3.5">ID</th>
                   <th class="px-5 py-3.5">Pengguna</th>
@@ -298,16 +313,16 @@
                   <th class="px-5 py-3.5 text-center">Aksi</th>
                 </tr>
               </thead>
-              <tbody id="usersTableBody" class="divide-y divide-slate-800/80">
+              <tbody id="usersTableBody" class="divide-y divide-slate-500/10">
                 <tr>
-                  <td colspan="6" class="px-5 py-8 text-center theme-sub">Memuat data pengguna...</td>
+                  <td colspan="6" class="px-5 py-8 text-center theme-muted">Memuat data pengguna...</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
           <!-- Pagination Footer -->
-          <div class="px-5 py-3.5 bg-slate-900/60 border-t border-slate-800 flex items-center justify-between text-xs theme-sub">
+          <div class="px-5 py-3.5 glass-panel border-t flex items-center justify-between text-xs theme-muted">
             <span id="usersPaginationInfo">Menampilkan 0 dari 0 pengguna</span>
             <div class="flex items-center gap-2" id="usersPaginationBtns">
             </div>
@@ -319,25 +334,25 @@
   </div>
 
   <!-- MODAL: FORM SEKOLAH (TAMBAH / EDIT) -->
-  <div id="modalSekolah" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+  <div id="modalSekolah" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="glass-modal w-full max-w-lg rounded-2xl p-6 shadow-2xl relative">
-      <div class="flex items-center justify-between pb-4 border-b border-slate-700/60">
-        <h3 id="modalSekolahTitle" class="text-lg font-bold theme-title">Tambah Data Sekolah</h3>
-        <button id="closeModalSekolah" class="text-slate-400 hover:text-red-400"><i class="fa-solid fa-xmark text-lg"></i></button>
+      <div class="flex items-center justify-between pb-4 border-b border-slate-500/20">
+        <h3 id="modalSekolahTitle" class="text-lg font-bold theme-text">Tambah Data Sekolah</h3>
+        <button id="closeModalSekolah" class="theme-muted hover:text-red-500"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
 
       <form id="formSekolah" class="mt-4 space-y-4">
         <input type="hidden" id="sekolahNpsnInput">
 
         <div>
-          <label class="block text-xs font-semibold uppercase theme-sub mb-1">Nama Sekolah</label>
-          <input type="text" id="sekolahNamaInput" required placeholder="Contoh: SMA Negeri 1 Serang" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm theme-title focus:outline-none focus:border-indigo-500">
+          <label class="block text-xs font-semibold uppercase theme-muted mb-1">Nama Sekolah</label>
+          <input type="text" id="sekolahNamaInput" required placeholder="Contoh: SMA Negeri 1 Serang" class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold uppercase theme-sub mb-1">Jenjang</label>
-            <select id="sekolahJenjangInput" required class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm theme-title focus:outline-none focus:border-indigo-500">
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1">Jenjang</label>
+            <select id="sekolahJenjangInput" required class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
               <option value="SD / Sederajat">SD / Sederajat</option>
               <option value="SMP / Sederajat">SMP / Sederajat</option>
               <option value="SMA / Sederajat">SMA / Sederajat</option>
@@ -345,8 +360,8 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold uppercase theme-sub mb-1">Klasifikasi</label>
-            <select id="sekolahKlasifikasiInput" required class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm theme-title focus:outline-none focus:border-indigo-500">
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1">Klasifikasi</label>
+            <select id="sekolahKlasifikasiInput" required class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
               <option value="Terdaftar">Terdaftar</option>
               <option value="Dasar">Dasar</option>
               <option value="Paripurna">Paripurna</option>
@@ -355,8 +370,8 @@
         </div>
 
         <div>
-          <label class="block text-xs font-semibold uppercase theme-sub mb-1">Wilayah (Kabupaten / Kota Banten)</label>
-          <select id="sekolahWilayahInput" required class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm theme-title focus:outline-none focus:border-indigo-500">
+          <label class="block text-xs font-semibold uppercase theme-muted mb-1">Wilayah (Kabupaten / Kota Banten)</label>
+          <select id="sekolahWilayahInput" required class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
             <option value="Kabupaten Serang">Kabupaten Serang</option>
             <option value="Kabupaten Tangerang">Kabupaten Tangerang</option>
             <option value="Kabupaten Pandeglang">Kabupaten Pandeglang</option>
@@ -369,12 +384,12 @@
         </div>
 
         <div>
-          <label class="block text-xs font-semibold uppercase theme-sub mb-1">Alamat</label>
-          <textarea id="sekolahAlamatInput" rows="2" placeholder="Jl. Raya No. 123..." class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm theme-title focus:outline-none focus:border-indigo-500"></textarea>
+          <label class="block text-xs font-semibold uppercase theme-muted mb-1">Alamat</label>
+          <textarea id="sekolahAlamatInput" rows="2" placeholder="Jl. Raya No. 123..." class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500"></textarea>
         </div>
 
-        <div class="pt-4 border-t border-slate-700/60 flex justify-end gap-3">
-          <button type="button" id="btnCancelSekolah" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl">Batal</button>
+        <div class="pt-4 border-t border-slate-500/20 flex justify-end gap-3">
+          <button type="button" id="btnCancelSekolah" class="px-4 py-2 theme-btn-sec text-xs font-semibold rounded-xl border">Batal</button>
           <button type="submit" id="btnSaveSekolah" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/30">Simpan Data</button>
         </div>
       </form>
@@ -382,43 +397,43 @@
   </div>
 
   <!-- MODAL: FORM USER (TAMBAH / EDIT) -->
-  <div id="modalUser" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+  <div id="modalUser" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="glass-modal w-full max-w-lg rounded-2xl p-6 shadow-2xl relative">
-      <div class="flex items-center justify-between pb-4 border-b border-slate-700/60">
-        <h3 id="modalUserTitle" class="text-lg font-bold theme-title">Tambah Pengguna Baru</h3>
-        <button id="closeModalUser" class="text-slate-400 hover:text-red-400"><i class="fa-solid fa-xmark text-lg"></i></button>
+      <div class="flex items-center justify-between pb-4 border-b border-slate-500/20">
+        <h3 id="modalUserTitle" class="text-lg font-bold theme-text">Tambah Pengguna Baru</h3>
+        <button id="closeModalUser" class="theme-muted hover:text-red-500"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
 
       <form id="formUser" class="mt-4 space-y-4">
         <input type="hidden" id="userIdInput">
 
         <div>
-          <label class="block text-xs font-semibold uppercase theme-sub mb-1">Nama Lengkap</label>
-          <input type="text" id="userNamaLengkapInput" required placeholder="Contoh: Dani Yusuf" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm theme-title focus:outline-none focus:border-indigo-500">
+          <label class="block text-xs font-semibold uppercase theme-muted mb-1">Nama Lengkap</label>
+          <input type="text" id="userNamaLengkapInput" required placeholder="Contoh: Dani Yusuf" class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold uppercase theme-sub mb-1">Username</label>
-            <input type="text" id="userUsernameInput" required placeholder="dani95" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm theme-title focus:outline-none focus:border-indigo-500">
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1">Username</label>
+            <input type="text" id="userUsernameInput" required placeholder="dani95" class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
           </div>
 
           <div>
-            <label class="block text-xs font-semibold uppercase theme-sub mb-1">Email</label>
-            <input type="email" id="userEmailInput" required placeholder="dani@dalduk.go.id" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm theme-title focus:outline-none focus:border-indigo-500">
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1">Email</label>
+            <input type="email" id="userEmailInput" required placeholder="dani@dalduk.go.id" class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold uppercase theme-sub mb-1" id="userPasswordLabel">Password</label>
-          <input type="password" id="userPasswordInput" placeholder="••••••••" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm theme-title focus:outline-none focus:border-indigo-500">
-          <p class="text-[11px] theme-sub mt-1 hidden" id="passwordHint">Biarkan kosong jika tidak ingin mengubah password.</p>
+          <label class="block text-xs font-semibold uppercase theme-muted mb-1" id="userPasswordLabel">Password</label>
+          <input type="password" id="userPasswordInput" placeholder="••••••••" class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+          <p class="text-[11px] theme-muted mt-1 hidden" id="passwordHint">Biarkan kosong jika tidak ingin mengubah password.</p>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold uppercase theme-sub mb-1">Role / Hak Akses</label>
-            <select id="userRoleInput" required class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm theme-title focus:outline-none focus:border-indigo-500">
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1">Role / Hak Akses</label>
+            <select id="userRoleInput" required class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
               <option value="admin">Admin (Full Access)</option>
               <option value="operator_sekolah">Operator Sekolah</option>
               <option value="viewer">Viewer (Read-Only)</option>
@@ -426,16 +441,16 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold uppercase theme-sub mb-1">Status Akun</label>
-            <select id="userStatusInput" required class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm theme-title focus:outline-none focus:border-indigo-500">
+            <label class="block text-xs font-semibold uppercase theme-muted mb-1">Status Akun</label>
+            <select id="userStatusInput" required class="w-full px-3.5 py-2.5 theme-input border rounded-xl text-sm focus:outline-none focus:border-indigo-500">
               <option value="true">Aktif</option>
               <option value="false">Nonaktif</option>
             </select>
           </div>
         </div>
 
-        <div class="pt-4 border-t border-slate-700/60 flex justify-end gap-3">
-          <button type="button" id="btnCancelUser" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl">Batal</button>
+        <div class="pt-4 border-t border-slate-500/20 flex justify-end gap-3">
+          <button type="button" id="btnCancelUser" class="px-4 py-2 theme-btn-sec text-xs font-semibold rounded-xl border">Batal</button>
           <button type="submit" id="btnSaveUser" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/30">Simpan User</button>
         </div>
       </form>
@@ -517,17 +532,17 @@
 
       if (currentUser.roleId === 'admin') {
         badge.innerText = 'Administrator';
-        badge.className = 'text-[10px] text-emerald-400 mt-1 uppercase font-bold tracking-wider';
-        roleDesc.innerHTML = 'Status: <strong class="text-emerald-400">Admin</strong>.<br>Anda memiliki hak akses penuh (CRUD Sekolah & Users).';
+        badge.className = 'text-[10px] text-emerald-500 mt-1 uppercase font-bold tracking-wider';
+        roleDesc.innerHTML = 'Status: <strong class="text-emerald-500">Admin</strong>.<br>Anda memiliki hak akses penuh (CRUD Sekolah & Users).';
       } else if (currentUser.roleId === 'operator_sekolah') {
         badge.innerText = 'Operator Sekolah';
-        badge.className = 'text-[10px] text-sky-400 mt-1 uppercase font-bold tracking-wider';
-        roleDesc.innerHTML = 'Status: <strong class="text-sky-400">Operator Sekolah</strong>.<br>Dapat mengelola (CRUD) data sekolah.';
+        badge.className = 'text-[10px] text-sky-500 mt-1 uppercase font-bold tracking-wider';
+        roleDesc.innerHTML = 'Status: <strong class="text-sky-500">Operator Sekolah</strong>.<br>Dapat mengelola (CRUD) data sekolah.';
         navUsers.classList.add('opacity-50', 'cursor-not-allowed');
       } else {
         badge.innerText = 'Viewer';
-        badge.className = 'text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-wider';
-        roleDesc.innerHTML = 'Status: <strong class="text-slate-400">Viewer</strong>.<br>Hanya dapat melihat data.';
+        badge.className = 'text-[10px] theme-muted mt-1 uppercase font-bold tracking-wider';
+        roleDesc.innerHTML = 'Status: <strong class="theme-muted">Viewer</strong>.<br>Hanya dapat melihat data.';
         navUsers.classList.add('opacity-50', 'cursor-not-allowed');
       }
     }
@@ -540,7 +555,7 @@
 
     navSekolah.addEventListener('click', () => {
       navSekolah.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition bg-indigo-600 text-white shadow-md';
-      navUsers.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-indigo-400';
+      navUsers.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition theme-muted hover:text-indigo-500 hover:bg-indigo-500/10';
       tabSekolah.classList.remove('hidden');
       tabUsers.classList.add('hidden');
       loadSekolahData();
@@ -552,7 +567,7 @@
         return;
       }
       navUsers.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition bg-indigo-600 text-white shadow-md';
-      navSekolah.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-indigo-400';
+      navSekolah.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition theme-muted hover:text-indigo-500 hover:bg-indigo-500/10';
       tabUsers.classList.remove('hidden');
       tabSekolah.classList.add('hidden');
       loadUsersData();
@@ -601,33 +616,33 @@
     function renderSekolahTable(items) {
       const tbody = document.getElementById('sekolahTableBody');
       if (!items || items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="px-5 py-8 text-center theme-sub">Tidak ada data sekolah ditemukan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="px-5 py-8 text-center theme-muted">Tidak ada data sekolah ditemukan.</td></tr>`;
         return;
       }
 
       const isReadOnly = currentUser?.roleId === 'viewer';
 
       tbody.innerHTML = items.map(item => `
-        <tr class="hover:bg-slate-800/40 transition">
-          <td class="px-5 py-3 font-mono text-xs text-indigo-400 font-bold">${item.npsn}</td>
-          <td class="px-5 py-3 font-medium theme-title">${item.namaSekolah}</td>
-          <td class="px-5 py-3 text-xs">${item.jenjang}</td>
+        <tr class="theme-table-row transition">
+          <td class="px-5 py-3 font-mono text-xs text-indigo-500 font-bold">${item.npsn}</td>
+          <td class="px-5 py-3 font-medium theme-text">${item.namaSekolah}</td>
+          <td class="px-5 py-3 text-xs theme-text">${item.jenjang}</td>
           <td class="px-5 py-3">
             <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold ${
-              item.klasifikasi === 'Paripurna' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
-              item.klasifikasi === 'Dasar' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' :
-              'bg-slate-700/50 text-slate-300'
+              item.klasifikasi === 'Paripurna' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/30' :
+              item.klasifikasi === 'Dasar' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/30' :
+              'bg-slate-500/10 text-slate-500 border border-slate-500/30'
             }">${item.klasifikasi}</span>
           </td>
-          <td class="px-5 py-3 text-xs theme-sub">${item.wilayah}</td>
-          <td class="px-5 py-3 text-xs theme-sub max-w-xs truncate">${item.alamat || '-'}</td>
+          <td class="px-5 py-3 text-xs theme-muted">${item.wilayah}</td>
+          <td class="px-5 py-3 text-xs theme-muted max-w-xs truncate">${item.alamat || '-'}</td>
           <td class="px-5 py-3 text-center">
-            ${isReadOnly ? '<span class="text-xs text-slate-500">Read-only</span>' : `
+            ${isReadOnly ? '<span class="text-xs theme-muted">Read-only</span>' : `
               <div class="flex items-center justify-center gap-2">
-                <button onclick="editSekolah(${item.npsn}, '${encodeURIComponent(JSON.stringify(item))}')" class="p-1.5 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-lg transition" title="Edit">
+                <button onclick="editSekolah(${item.npsn}, '${encodeURIComponent(JSON.stringify(item))}')" class="p-1.5 theme-btn-sec rounded-lg border transition hover:text-indigo-500" title="Edit">
                   <i class="fa-solid fa-pen-to-square text-xs"></i>
                 </button>
-                <button onclick="deleteSekolah(${item.npsn})" class="p-1.5 bg-slate-800 hover:bg-red-600 text-slate-300 hover:text-white rounded-lg transition" title="Hapus">
+                <button onclick="deleteSekolah(${item.npsn})" class="p-1.5 theme-btn-sec rounded-lg border transition hover:text-red-500" title="Hapus">
                   <i class="fa-solid fa-trash-can text-xs"></i>
                 </button>
               </div>
@@ -643,13 +658,13 @@
       const container = document.getElementById('sekolahPaginationBtns');
       let html = '';
       if (pg.page > 1) {
-        html += `<button onclick="loadSekolahData(${pg.page - 1})" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg">Prev</button>`;
+        html += `<button onclick="loadSekolahData(${pg.page - 1})" class="px-3 py-1 theme-btn-sec border rounded-lg">Prev</button>`;
       }
       for (let i = 1; i <= pg.totalPages; i++) {
-        html += `<button onclick="loadSekolahData(${i})" class="px-3 py-1 rounded-lg ${i === pg.page ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${i}</button>`;
+        html += `<button onclick="loadSekolahData(${i})" class="px-3 py-1 rounded-lg ${i === pg.page ? 'bg-indigo-600 text-white font-bold' : 'theme-btn-sec border'}">${i}</button>`;
       }
       if (pg.page < pg.totalPages) {
-        html += `<button onclick="loadSekolahData(${pg.page + 1})" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg">Next</button>`;
+        html += `<button onclick="loadSekolahData(${pg.page + 1})" class="px-3 py-1 theme-btn-sec border rounded-lg">Next</button>`;
       }
       container.innerHTML = html;
     }
@@ -770,37 +785,37 @@
     function renderUsersTable(items) {
       const tbody = document.getElementById('usersTableBody');
       if (!items || items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="px-5 py-8 text-center theme-sub">Tidak ada pengguna ditemukan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="px-5 py-8 text-center theme-muted">Tidak ada pengguna ditemukan.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = items.map(u => `
-        <tr class="hover:bg-slate-800/40 transition">
-          <td class="px-5 py-3 font-mono text-xs text-indigo-400 font-bold">#${u.idUser}</td>
+        <tr class="theme-table-row transition">
+          <td class="px-5 py-3 font-mono text-xs text-indigo-500 font-bold">#${u.idUser}</td>
           <td class="px-5 py-3">
-            <div class="font-medium theme-title">${u.namaLengkap}</div>
-            <div class="text-xs theme-sub font-mono">@${u.username}</div>
+            <div class="font-medium theme-text">${u.namaLengkap}</div>
+            <div class="text-xs theme-muted font-mono">@${u.username}</div>
           </td>
-          <td class="px-5 py-3 text-xs theme-sub">${u.email}</td>
+          <td class="px-5 py-3 text-xs theme-muted">${u.email}</td>
           <td class="px-5 py-3 text-xs">
             <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold ${
-              u.roleId === 'admin' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
-              u.roleId === 'operator_sekolah' ? 'bg-sky-500/10 text-sky-400 border border-sky-500/30' :
-              'bg-slate-700/50 text-slate-300'
+              u.roleId === 'admin' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/30' :
+              u.roleId === 'operator_sekolah' ? 'bg-sky-500/10 text-sky-500 border border-sky-500/30' :
+              'bg-slate-500/10 text-slate-500 border border-slate-500/30'
             }">${u.roleId}</span>
           </td>
           <td class="px-5 py-3 text-xs">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.isActive ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.isActive ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'}">
               ${u.isActive ? 'AKTIF' : 'NONAKTIF'}
             </span>
           </td>
           <td class="px-5 py-3 text-center">
             <div class="flex items-center justify-center gap-2">
-              <button onclick="editUser(${u.idUser}, '${encodeURIComponent(JSON.stringify(u))}')" class="p-1.5 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-lg transition" title="Edit / Reset Password">
+              <button onclick="editUser(${u.idUser}, '${encodeURIComponent(JSON.stringify(u))}')" class="p-1.5 theme-btn-sec rounded-lg border transition hover:text-indigo-500" title="Edit / Reset Password">
                 <i class="fa-solid fa-user-pen text-xs"></i>
               </button>
               ${u.idUser === currentUser?.idUser ? '' : `
-                <button onclick="deleteUser(${u.idUser}, '${u.username}')" class="p-1.5 bg-slate-800 hover:bg-red-600 text-slate-300 hover:text-white rounded-lg transition" title="Hapus">
+                <button onclick="deleteUser(${u.idUser}, '${u.username}')" class="p-1.5 theme-btn-sec rounded-lg border transition hover:text-red-500" title="Hapus">
                   <i class="fa-solid fa-trash-can text-xs"></i>
                 </button>
               `}
@@ -816,13 +831,13 @@
       const container = document.getElementById('usersPaginationBtns');
       let html = '';
       if (pg.page > 1) {
-        html += `<button onclick="loadUsersData(${pg.page - 1})" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg">Prev</button>`;
+        html += `<button onclick="loadUsersData(${pg.page - 1})" class="px-3 py-1 theme-btn-sec border rounded-lg">Prev</button>`;
       }
       for (let i = 1; i <= pg.totalPages; i++) {
-        html += `<button onclick="loadUsersData(${i})" class="px-3 py-1 rounded-lg ${i === pg.page ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${i}</button>`;
+        html += `<button onclick="loadUsersData(${i})" class="px-3 py-1 rounded-lg ${i === pg.page ? 'bg-indigo-600 text-white font-bold' : 'theme-btn-sec border'}">${i}</button>`;
       }
       if (pg.page < pg.totalPages) {
-        html += `<button onclick="loadUsersData(${pg.page + 1})" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg">Next</button>`;
+        html += `<button onclick="loadUsersData(${pg.page + 1})" class="px-3 py-1 theme-btn-sec border rounded-lg">Next</button>`;
       }
       container.innerHTML = html;
     }
