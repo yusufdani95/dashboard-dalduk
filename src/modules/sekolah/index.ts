@@ -260,6 +260,126 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
     }
   )
 
+  // POST /api/sekolah/batch-delete - Delete multiple sekolah records (Admin & Operator Sekolah)
+  .post(
+    '/batch-delete',
+    async ({ body, jwt, cookie: { auth_token }, headers, set }) => {
+      const auth = await authenticateAndAuthorize(jwt, auth_token, headers, ['admin', 'operator_sekolah']);
+      if (!auth.authorized) {
+        set.status = auth.status;
+        return { success: false, error: auth.error };
+      }
+
+      try {
+        const nos = body.nos || body.npsns;
+        if (!nos || nos.length === 0) {
+          set.status = 400;
+          return { success: false, error: 'Tidak ada data sekolah yang dipilih' };
+        }
+
+        await db.delete(dataSekolah).where(inArray(dataSekolah.no, nos));
+
+        return {
+          success: true,
+          message: `${nos.length} data sekolah berhasil dihapus`,
+        };
+      } catch (error: any) {
+        set.status = 500;
+        return {
+          success: false,
+          error: error?.message || 'Gagal menghapus beberapa data sekolah',
+        };
+      }
+    },
+    {
+      body: t.Object({
+        nos: t.Optional(t.Array(t.Numeric())),
+        npsns: t.Optional(t.Array(t.Numeric())),
+      }),
+      detail: {
+        tags: ['Sekolah'],
+        summary: 'Batch delete sekolah records by list of NOs',
+      },
+    }
+  )
+
+  // POST /api/sekolah/batch-import - Import multiple sekolah records (Admin & Operator Sekolah)
+  .post(
+    '/batch-import',
+    async ({ body, jwt, cookie: { auth_token }, headers, set }) => {
+      const auth = await authenticateAndAuthorize(jwt, auth_token, headers, ['admin', 'operator_sekolah']);
+      if (!auth.authorized) {
+        set.status = auth.status;
+        return { success: false, error: auth.error };
+      }
+
+      try {
+        const items = body.items;
+        if (!items || items.length === 0) {
+          set.status = 400;
+          return { success: false, error: 'Tidak ada data sekolah untuk diimpor' };
+        }
+
+        const validItems = items.map((item) => {
+          let jenjang = item.jenjang || '';
+          if (jenjang.includes('SD')) jenjang = 'SD / Sederajat';
+          else if (jenjang.includes('SMP')) jenjang = 'SMP / Sederajat';
+          else if (jenjang.includes('SMA') || jenjang.includes('SMK')) jenjang = 'SMA / Sederajat';
+          else jenjang = 'SD / Sederajat';
+
+          let klasifikasi = item.klasifikasi || '';
+          if (klasifikasi !== 'Terdaftar' && klasifikasi !== 'Dasar' && klasifikasi !== 'Paripurna') {
+            klasifikasi = 'Terdaftar';
+          }
+
+          return {
+            namaSekolah: item.namaSekolah ? item.namaSekolah.trim() : '',
+            jenjang: jenjang as any,
+            klasifikasi: klasifikasi as any,
+            wilayah: item.wilayah ? item.wilayah.trim() : 'Kota Serang',
+            alamat: item.alamat ? item.alamat.trim() : null,
+          };
+        }).filter(item => item.namaSekolah.length > 0);
+
+        if (validItems.length === 0) {
+          set.status = 400;
+          return { success: false, error: 'Data yang diunggah tidak memiliki nama sekolah yang valid' };
+        }
+
+        await db.insert(dataSekolah).values(validItems);
+
+        return {
+          success: true,
+          message: `Berhasil mengimpor ${validItems.length} data sekolah`,
+          count: validItems.length,
+        };
+      } catch (error: any) {
+        set.status = 500;
+        return {
+          success: false,
+          error: error?.message || 'Gagal mengimpor data sekolah',
+        };
+      }
+    },
+    {
+      body: t.Object({
+        items: t.Array(
+          t.Object({
+            namaSekolah: t.String(),
+            jenjang: t.String(),
+            klasifikasi: t.String(),
+            wilayah: t.String(),
+            alamat: t.Optional(t.Nullable(t.String())),
+          })
+        ),
+      }),
+      detail: {
+        tags: ['Sekolah'],
+        summary: 'Batch import sekolah records (Admin & Operator Sekolah)',
+      },
+    }
+  )
+
   // PUT /api/sekolah/:no - Update a sekolah (Admin & Operator Sekolah)
   .put(
     '/:no',
@@ -351,49 +471,6 @@ export const sekolahRoutes = new Elysia({ prefix: '/api/sekolah' })
       detail: {
         tags: ['Sekolah'],
         summary: 'Delete a sekolah record by NO (Admin & Operator Sekolah)',
-      },
-    }
-  )
-
-  // POST /api/sekolah/batch-delete - Delete multiple sekolah records (Admin & Operator Sekolah)
-  .post(
-    '/batch-delete',
-    async ({ body, jwt, cookie: { auth_token }, headers, set }) => {
-      const auth = await authenticateAndAuthorize(jwt, auth_token, headers, ['admin', 'operator_sekolah']);
-      if (!auth.authorized) {
-        set.status = auth.status;
-        return { success: false, error: auth.error };
-      }
-
-      try {
-        const nos = body.nos || body.npsns;
-        if (!nos || nos.length === 0) {
-          set.status = 400;
-          return { success: false, error: 'Tidak ada data sekolah yang dipilih' };
-        }
-
-        await db.delete(dataSekolah).where(inArray(dataSekolah.no, nos));
-
-        return {
-          success: true,
-          message: `${nos.length} data sekolah berhasil dihapus`,
-        };
-      } catch (error: any) {
-        set.status = 500;
-        return {
-          success: false,
-          error: error?.message || 'Gagal menghapus beberapa data sekolah',
-        };
-      }
-    },
-    {
-      body: t.Object({
-        nos: t.Optional(t.Array(t.Numeric())),
-        npsns: t.Optional(t.Array(t.Numeric())),
-      }),
-      detail: {
-        tags: ['Sekolah'],
-        summary: 'Batch delete sekolah records by list of NOs',
       },
     }
   );
