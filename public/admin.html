@@ -1065,6 +1065,11 @@
         } else {
           alert(result.error || 'Gagal menyimpan pengguna.');
         }
+      } catch (err) {
+        alert('Terjadi kesalahan koneksi.');
+      }
+    });
+
     // --- EXCEL EXPORT LOGIC FOR SEKOLAH ---
     async function exportSekolahExcel() {
       const search = document.getElementById('searchSekolahInput').value.trim();
