@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -98,8 +99,13 @@
       transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
-    .theme-title { color: var(--title-color); }
-    .theme-sub { color: var(--sub-color); }
+    .theme-title {
+      color: var(--title-color);
+    }
+
+    .theme-sub {
+      color: var(--sub-color);
+    }
 
     .theme-input {
       background-color: var(--input-bg) !important;
@@ -134,13 +140,15 @@
       border-radius: 0.75rem;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
     }
+
     .leaflet-popup-tip {
       background: var(--popup-bg);
     }
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="/logo.png" />
+
+    < !-- Favicon --><link rel="icon" type="image/png" href="/logo.png" />
   </style>
 </head>
+
 <body class="min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
   <!-- Top Navigation Bar -->
@@ -155,13 +163,16 @@
 
     <div class="flex items-center gap-3">
       <!-- Theme Switcher Button -->
-      <button id="btnThemeToggle" onclick="toggleTheme()" class="px-3.5 py-2 text-xs font-medium theme-btn-secondary rounded-lg border transition flex items-center gap-2" title="Switch Theme">
+      <button id="btnThemeToggle" onclick="toggleTheme()"
+        class="px-3.5 py-2 text-xs font-medium theme-btn-secondary rounded-lg border transition flex items-center gap-2"
+        title="Switch Theme">
         <i id="themeIcon" class="fa-solid fa-sun text-amber-400"></i>
         <span id="themeText" class="hidden sm:inline">Light Mode</span>
       </button>
 
       <!-- Admin Access / Login Button -->
-      <a id="btnAdminAccess" href="/login" class="px-3.5 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition flex items-center gap-2 shadow-md shadow-indigo-600/30">
+      <a id="btnAdminAccess" href="/login"
+        class="px-3.5 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition flex items-center gap-2 shadow-md shadow-indigo-600/30">
         <i class="fa-solid fa-right-to-bracket"></i>
         <span>Login Admin</span>
       </a>
@@ -182,7 +193,8 @@
             <i class="fa-solid fa-check-circle"></i> Sesuai filter analytics
           </p>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500 text-xl">
+        <div
+          class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500 text-xl">
           <i class="fa-solid fa-building-columns"></i>
         </div>
       </div>
@@ -194,7 +206,8 @@
           <h2 id="cardSD" class="text-3xl font-bold text-sky-500 mt-1">0</h2>
           <p class="text-xs theme-sub mt-1">Tingkat Dasar</p>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-500 text-xl">
+        <div
+          class="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-500 text-xl">
           <i class="fa-solid fa-child"></i>
         </div>
       </div>
@@ -206,7 +219,8 @@
           <h2 id="cardSMP" class="text-3xl font-bold text-amber-500 mt-1">0</h2>
           <p class="text-xs theme-sub mt-1">Tingkat Menengah Pertama</p>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 text-xl">
+        <div
+          class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 text-xl">
           <i class="fa-solid fa-user-graduate"></i>
         </div>
       </div>
@@ -218,7 +232,8 @@
           <h2 id="cardSMA" class="text-3xl font-bold text-emerald-500 mt-1">0</h2>
           <p class="text-xs theme-sub mt-1">Tingkat Menengah Atas</p>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 text-xl">
+        <div
+          class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 text-xl">
           <i class="fa-solid fa-graduation-cap"></i>
         </div>
       </div>
@@ -232,10 +247,12 @@
             <i class="fa-solid fa-sliders text-indigo-500"></i>
             Panel Filter Interaktif (Grafik & Peta)
           </h2>
-          <p class="text-[11px] theme-sub mt-0.5">Mengontrol data bagian: 1. Proporsi Jenjang, 2. Distribusi Klasifikasi, dan 3. Peta Interaktif</p>
+          <p class="text-[11px] theme-sub mt-0.5">Mengontrol data bagian: 1. Proporsi Jenjang, 2. Distribusi
+            Klasifikasi, dan 3. Peta Interaktif</p>
         </div>
 
-        <button onclick="resetAnalyticsFilters()" class="self-start sm:self-auto text-xs text-rose-400 hover:text-rose-300 transition flex items-center gap-1 font-medium">
+        <button onclick="resetAnalyticsFilters()"
+          class="self-start sm:self-auto text-xs text-rose-400 hover:text-rose-300 transition flex items-center gap-1 font-medium">
           <i class="fa-solid fa-rotate-left text-[10px]"></i> Reset Filter Analytics
         </button>
       </div>
@@ -244,17 +261,22 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
         <!-- Filter 1: Cari Nama/Alamat/NO -->
         <div class="text-center">
-          <label class="block theme-sub font-medium text-xs truncate mb-1 text-center" title="Pencarian Kata Kunci">Pencarian Kata Kunci</label>
+          <label class="block theme-sub font-medium text-xs truncate mb-1 text-center"
+            title="Pencarian Kata Kunci">Pencarian Kata Kunci</label>
           <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 theme-sub text-[11px]"></i>
-            <input type="text" id="analyticsSearch" oninput="onAnalyticsFilterChange()" placeholder="Cari sekolah, alamat..." class="w-full theme-input rounded-lg pl-8 pr-3 h-9 text-xs text-center focus:outline-none focus:border-indigo-500 transition" />
+            <input type="text" id="analyticsSearch" oninput="onAnalyticsFilterChange()"
+              placeholder="Cari sekolah, alamat..."
+              class="w-full theme-input rounded-lg pl-8 pr-3 h-9 text-xs text-center focus:outline-none focus:border-indigo-500 transition" />
           </div>
         </div>
 
         <!-- Filter 2: Jenjang Sekolah -->
         <div class="text-center">
-          <label class="block theme-sub font-medium text-xs truncate mb-1 text-center" title="Filter Jenjang Sekolah">Filter Jenjang Sekolah</label>
-          <select id="analyticsJenjang" onchange="onAnalyticsFilterChange()" class="w-full theme-input rounded-lg px-3 h-9 text-xs text-center focus:outline-none focus:border-indigo-500">
+          <label class="block theme-sub font-medium text-xs truncate mb-1 text-center"
+            title="Filter Jenjang Sekolah">Filter Jenjang Sekolah</label>
+          <select id="analyticsJenjang" onchange="onAnalyticsFilterChange()"
+            class="w-full theme-input rounded-lg px-3 h-9 text-xs text-center focus:outline-none focus:border-indigo-500">
             <option value="">Semua Jenjang (SD, SMP, SMA)</option>
             <option value="SD / Sederajat">SD / Sederajat</option>
             <option value="SMP / Sederajat">SMP / Sederajat</option>
@@ -264,8 +286,10 @@
 
         <!-- Filter 3: Klasifikasi Sekolah -->
         <div class="text-center">
-          <label class="block theme-sub font-medium text-xs truncate mb-1 text-center" title="Filter Klasifikasi Sekolah">Filter Klasifikasi Sekolah</label>
-          <select id="analyticsKlasifikasi" onchange="onAnalyticsFilterChange()" class="w-full theme-input rounded-lg px-3 h-9 text-xs text-center focus:outline-none focus:border-indigo-500">
+          <label class="block theme-sub font-medium text-xs truncate mb-1 text-center"
+            title="Filter Klasifikasi Sekolah">Filter Klasifikasi Sekolah</label>
+          <select id="analyticsKlasifikasi" onchange="onAnalyticsFilterChange()"
+            class="w-full theme-input rounded-lg px-3 h-9 text-xs text-center focus:outline-none focus:border-indigo-500">
             <option value="">Semua Klasifikasi Status</option>
             <option value="Terdaftar">Terdaftar</option>
             <option value="Dasar">Dasar</option>
@@ -275,8 +299,10 @@
 
         <!-- Filter 4: Wilayah Kabupaten / Kota (Populated dynamically) -->
         <div class="text-center">
-          <label class="block theme-sub font-medium text-xs truncate mb-1 text-center" title="Filter Wilayah Kabupaten / Kota">Filter Wilayah Kabupaten / Kota</label>
-          <select id="analyticsWilayah" onchange="onAnalyticsFilterChange()" class="w-full theme-input rounded-lg px-3 h-9 text-xs text-center focus:outline-none focus:border-indigo-500">
+          <label class="block theme-sub font-medium text-xs truncate mb-1 text-center"
+            title="Filter Wilayah Kabupaten / Kota">Filter Wilayah Kabupaten / Kota</label>
+          <select id="analyticsWilayah" onchange="onAnalyticsFilterChange()"
+            class="w-full theme-input rounded-lg px-3 h-9 text-xs text-center focus:outline-none focus:border-indigo-500">
             <option value="">Semua Wilayah Kabupaten / Kota</option>
           </select>
         </div>
@@ -326,28 +352,39 @@
             <i class="fa-solid fa-map-location-dot text-rose-500"></i>
             3. Peta Pesebaran Sekolah Interaktif
           </h3>
-          <p class="text-xs theme-sub">Menampilkan kluster per Kabupaten/Kota pada zoom out, Kecamatan pada medium zoom, dan titik asli sekolah pada zoom in</p>
+          <p class="text-xs theme-sub">Menampilkan kluster per Kabupaten/Kota pada zoom out, Kecamatan pada medium zoom,
+            dan titik asli sekolah pada zoom in</p>
         </div>
-        
+
         <div class="flex flex-wrap items-center gap-3 text-xs">
           <!-- Active Zoom Level Indicator -->
-          <div id="mapLevelBadge" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center gap-2">
+          <div id="mapLevelBadge"
+            class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center gap-2">
             <i class="fa-solid fa-layer-group text-indigo-400"></i>
             <span id="mapLevelText">Tingkat: Kabupaten / Kota (Zoom Out)</span>
           </div>
 
           <!-- Manual Level Switcher Controls -->
           <div class="flex items-center gap-1 theme-btn-secondary p-1 rounded-xl border">
-            <button id="btnZoomAuto" onclick="setMapManualLevel('auto')" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-indigo-600 text-white transition">Auto (Zoom)</button>
-            <button id="btnZoomKab" onclick="setMapManualLevel('kab')" class="px-2.5 py-1 rounded-lg text-[11px] font-medium theme-sub hover:text-white transition">Kab/Kota</button>
-            <button id="btnZoomKec" onclick="setMapManualLevel('kec')" class="px-2.5 py-1 rounded-lg text-[11px] font-medium theme-sub hover:text-white transition">Kecamatan</button>
-            <button id="btnZoomDetail" onclick="setMapManualLevel('detail')" class="px-2.5 py-1 rounded-lg text-[11px] font-medium theme-sub hover:text-white transition">Titik Sekolah</button>
+            <button id="btnZoomAuto" onclick="setMapManualLevel('auto')"
+              class="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-indigo-600 text-white transition">Auto
+              (Zoom)</button>
+            <button id="btnZoomKab" onclick="setMapManualLevel('kab')"
+              class="px-2.5 py-1 rounded-lg text-[11px] font-medium theme-sub hover:text-white transition">Kab/Kota</button>
+            <button id="btnZoomKec" onclick="setMapManualLevel('kec')"
+              class="px-2.5 py-1 rounded-lg text-[11px] font-medium theme-sub hover:text-white transition">Kecamatan</button>
+            <button id="btnZoomDetail" onclick="setMapManualLevel('detail')"
+              class="px-2.5 py-1 rounded-lg text-[11px] font-medium theme-sub hover:text-white transition">Titik
+              Sekolah</button>
           </div>
 
           <div class="hidden xl:flex items-center gap-2.5 border-l theme-table-border pl-3 text-xs">
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-sky-400 inline-block shadow-sm"></span> SD</span>
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-400 inline-block shadow-sm"></span> SMP</span>
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-400 inline-block shadow-sm"></span> SMA</span>
+            <span class="flex items-center gap-1.5"><span
+                class="w-3 h-3 rounded-full bg-sky-400 inline-block shadow-sm"></span> SD</span>
+            <span class="flex items-center gap-1.5"><span
+                class="w-3 h-3 rounded-full bg-amber-400 inline-block shadow-sm"></span> SMP</span>
+            <span class="flex items-center gap-1.5"><span
+                class="w-3 h-3 rounded-full bg-emerald-400 inline-block shadow-sm"></span> SMA</span>
           </div>
         </div>
       </div>
@@ -372,11 +409,13 @@
           <!-- Search Input Table -->
           <div class="relative min-w-[180px]">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 theme-sub text-[11px]"></i>
-            <input type="text" id="tableSearch" oninput="onTableFilterChange()" placeholder="Cari nama/alamat..." class="w-full theme-input rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none focus:border-indigo-500" />
+            <input type="text" id="tableSearch" oninput="onTableFilterChange()" placeholder="Cari nama/alamat..."
+              class="w-full theme-input rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none focus:border-indigo-500" />
           </div>
 
           <!-- Select Jenjang Table -->
-          <select id="tableFilterJenjang" onchange="onTableFilterChange()" class="theme-input rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
+          <select id="tableFilterJenjang" onchange="onTableFilterChange()"
+            class="theme-input rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
             <option value="">Semua Jenjang</option>
             <option value="SD / Sederajat">SD / Sederajat</option>
             <option value="SMP / Sederajat">SMP / Sederajat</option>
@@ -384,7 +423,8 @@
           </select>
 
           <!-- Select Klasifikasi Table -->
-          <select id="tableFilterKlasifikasi" onchange="onTableFilterChange()" class="theme-input rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
+          <select id="tableFilterKlasifikasi" onchange="onTableFilterChange()"
+            class="theme-input rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
             <option value="">Semua Klasifikasi</option>
             <option value="Terdaftar">Terdaftar</option>
             <option value="Dasar">Dasar</option>
@@ -392,13 +432,16 @@
           </select>
 
           <!-- Select Wilayah Table -->
-          <select id="tableFilterWilayah" onchange="onTableFilterChange()" class="theme-input rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
+          <select id="tableFilterWilayah" onchange="onTableFilterChange()"
+            class="theme-input rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
             <option value="">Semua Wilayah</option>
           </select>
 
           <!-- Limit Per Halaman (10, 50, 100) -->
           <div class="flex items-center gap-1">
-            <select id="tableLimit" onchange="onTableLimitChange()" class="theme-input rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-indigo-500 font-semibold text-indigo-400" title="Jumlah Baris Per Halaman">
+            <select id="tableLimit" onchange="onTableLimitChange()"
+              class="theme-input rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-indigo-500 font-semibold text-indigo-400"
+              title="Jumlah Baris Per Halaman">
               <option value="10">10 / hal</option>
               <option value="50">50 / hal</option>
               <option value="100">100 / hal</option>
@@ -406,7 +449,9 @@
           </div>
 
           <!-- Reset Table Filter -->
-          <button onclick="resetTableFilters()" class="px-2.5 py-1.5 rounded-lg theme-btn-secondary text-[11px] font-medium border hover:text-rose-400 transition" title="Reset Filter Tabel">
+          <button onclick="resetTableFilters()"
+            class="px-2.5 py-1.5 rounded-lg theme-btn-secondary text-[11px] font-medium border hover:text-rose-400 transition"
+            title="Reset Filter Tabel">
             <i class="fa-solid fa-rotate-left"></i>
           </button>
         </div>
@@ -422,31 +467,35 @@
               <th class="py-3 px-4">Jenjang</th>
               <th class="py-3 px-4">Klasifikasi</th>
               <th class="py-3 px-4">Wilayah</th>
-              <th class="py-3 px-4 text-center">Aksi</th>
             </tr>
           </thead>
           <tbody id="tableBody" class="divide-y theme-table-border">
             <tr>
-              <td colspan="6" class="py-8 text-center theme-sub">Memuat data sekolah...</td>
+              <td colspan="5" class="py-8 text-center theme-sub">Memuat data sekolah...</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <!-- Table Pagination Footer Control -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t theme-table-border text-xs">
+      <div
+        class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t theme-table-border text-xs">
         <div id="tablePaginationInfo" class="theme-sub text-xs">
-          Menampilkan <span id="pageStart" class="font-semibold theme-title">0</span> - <span id="pageEnd" class="font-semibold theme-title">0</span> dari <span id="pageTotalItems" class="font-semibold theme-title">0</span> data sekolah
+          Menampilkan <span id="pageStart" class="font-semibold theme-title">0</span> - <span id="pageEnd"
+            class="font-semibold theme-title">0</span> dari <span id="pageTotalItems"
+            class="font-semibold theme-title">0</span> data sekolah
         </div>
 
         <div class="flex items-center gap-2">
-          <button id="btnPrevPage" onclick="changeTablePage(currentTablePage - 1)" class="px-3 py-1.5 rounded-lg theme-btn-secondary border transition flex items-center gap-1 font-medium disabled:opacity-40 disabled:cursor-not-allowed">
+          <button id="btnPrevPage" onclick="changeTablePage(currentTablePage - 1)"
+            class="px-3 py-1.5 rounded-lg theme-btn-secondary border transition flex items-center gap-1 font-medium disabled:opacity-40 disabled:cursor-not-allowed">
             <i class="fa-solid fa-chevron-left text-[10px]"></i> Prev
           </button>
 
           <div id="pageNumbersContainer" class="flex items-center gap-1"></div>
 
-          <button id="btnNextPage" onclick="changeTablePage(currentTablePage + 1)" class="px-3 py-1.5 rounded-lg theme-btn-secondary border transition flex items-center gap-1 font-medium disabled:opacity-40 disabled:cursor-not-allowed">
+          <button id="btnNextPage" onclick="changeTablePage(currentTablePage + 1)"
+            class="px-3 py-1.5 rounded-lg theme-btn-secondary border transition flex items-center gap-1 font-medium disabled:opacity-40 disabled:cursor-not-allowed">
             Next <i class="fa-solid fa-chevron-right text-[10px]"></i>
           </button>
         </div>
@@ -897,7 +946,7 @@
       if (!data || data.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="6" class="py-8 text-center theme-sub">
+            <td colspan="5" class="py-8 text-center theme-sub">
               Tidak ada data sekolah yang sesuai dengan filter tabel aktif.
             </td>
           </tr>
@@ -923,11 +972,6 @@
             </span>
           </td>
           <td class="py-3 px-4 theme-title">${escapeHtml(item.wilayah)}</td>
-          <td class="py-3 px-4 text-center">
-            <button onclick="deleteSekolah(${item.no})" class="text-rose-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-500/10 transition" title="Hapus Data">
-              <i class="fa-solid fa-trash-can"></i>
-            </button>
-          </td>
         </tr>
       `).join('');
     }
@@ -938,7 +982,7 @@
 
     function setMapManualLevel(level) {
       manualMapLevel = level;
-      
+
       const btns = {
         auto: document.getElementById('btnZoomAuto'),
         kab: document.getElementById('btnZoomKab'),
@@ -1265,23 +1309,6 @@
       }
     }
 
-    // Delete Sekolah
-    async function deleteSekolah(no) {
-      if (!confirm(`Apakah Anda yakin ingin menghapus data sekolah dengan NO #${no}?`)) return;
-
-      try {
-        const res = await fetch(`/api/sekolah/${no}`, { method: 'DELETE' });
-        const json = await res.json();
-        if (json.success) {
-          fetchAnalyticsData();
-          fetchTableData();
-        } else {
-          alert('Gagal menghapus data.');
-        }
-      } catch (err) {
-        alert('Terjadi kesalahan jaringan.');
-      }
-    }
 
     // Seed Sample Data
     async function seedSampleData() {
@@ -1363,4 +1390,5 @@
     initTheme();
   </script>
 </body>
+
 </html>
